@@ -251,7 +251,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .hero__content {
   position: relative; z-index: 1;
   padding: clamp(34px, 6vw, 68px) clamp(24px, 5vw, 60px) clamp(96px, 12vw, 132px);
-  max-width: 640px;
+  max-width: 720px;
   color: #fff8ee;
   text-shadow: 0 2px 14px rgba(0,0,0,.28);
 }
@@ -262,9 +262,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .hero__title {
   font-family: var(--serif); font-weight: 700; margin: 0 0 16px;
-  font-size: clamp(2rem, 6vw, 3.3rem); line-height: 1.12; letter-spacing: .005em;
+  font-size: clamp(1.55rem, 7vw, 2.85rem); line-height: 1.16; letter-spacing: .005em;
   animation: fadeUp .7s var(--ease) .12s both;
 }
+/* 行の途中で折り返して1文字だけ孤立するのを防ぐ */
+.hero__title span { display: inline-block; }
 .hero__lead {
   margin: 0 0 26px; font-size: clamp(.98rem, 2vw, 1.1rem); color: #fdeede; max-width: 52ch;
   animation: fadeUp .7s var(--ease) .2s both;
