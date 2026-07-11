@@ -92,9 +92,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .app-header {
   position: sticky; top: 0; z-index: 100;
   background: color-mix(in srgb, var(--surface) 82%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+/* ブラーは擬似要素に置く: header 自体に backdrop-filter を掛けると
+   子孫の position: fixed の基準が header になり、モバイルの下部タブバーが壊れるため */
+.app-header::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
   backdrop-filter: saturate(1.4) blur(14px);
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
-  border-bottom: 1px solid var(--line);
 }
 .app-header__inner {
   max-width: var(--maxw); margin: 0 auto; height: var(--header-h);
@@ -580,6 +585,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
     padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
   }
   .tabs__btn { flex-direction: column; gap: 2px; padding: 6px 8px; border-radius: 12px; font-size: .68rem; flex: 1; }
+  /* タブが下部固定になった分、テーマ切替を右端へ */
+  .theme-toggle { margin-left: auto; }
   .tabs__btn.is-active { background: transparent; }
   .tabs__btn.is-active .tabs__icon { transform: translateY(-1px) scale(1.14); }
   .tabs__icon { font-size: 1.28rem; transition: transform .25s var(--ease); }
