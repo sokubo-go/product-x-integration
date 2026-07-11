@@ -9,6 +9,7 @@
   // --- データを防御的に取得(別エージェント作成物が無くても落ちない) ---
   var PHRASES = Array.isArray(window.PHRASES_DATA) ? window.PHRASES_DATA : [];
   var CULTURE = Array.isArray(window.CULTURE_DATA) ? window.CULTURE_DATA : [];
+  var PHOTOS = Array.isArray(window.PHOTOS_DATA) ? window.PHOTOS_DATA : [];
 
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
@@ -332,6 +333,17 @@
       '<div class="modal__text">' + paras + '</div>';
     modalBody.innerHTML = html;
 
+    // 文化記事に紐づく写真があれば、上部に写真ヘッダー(下地→読み込めたらフェードイン)
+    var headerPhoto = PHOTOS.filter(function (p) { return p.cultureId && p.cultureId === a.id; })[0];
+    if (headerPhoto) {
+      var head = document.createElement('div');
+      head.className = 'modal__photo';
+      var headSurface = buildPhotoSurface(headerPhoto, false);
+      head.appendChild(headSurface);
+      modalBody.insertBefore(head, modalBody.firstChild);
+      loadPhotoInto(headSurface, headerPhoto);
+    }
+
     // 関連フレーズ(音声ボタンつき)
     if (a.phrase && a.phrase.fr) {
       var box = document.createElement('div');
@@ -431,6 +443,189 @@
   });
 
   // =========================================================
+  // フォトギャラリー(フランスの風景)
+  //   PHOTOS_DATA は防御的に参照。無ければセクションごと非表示。
+  //   写真は実行時に Wikipedia REST API から取得。失敗・オフライン時は
+  //   grad + emoji + caption の下地のまま(=決して壊れて見えない)。
+  // =========================================================
+  var photoUrlCache = new Map(); // wiki => Promise<string|null>(同一写真の二重fetch防止)
+
+  function wikiSummaryUrl(wiki) {
+    return 'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(wiki);
+  }
+  function wikiPageUrl(wiki) {
+    return 'https://en.wikipedia.org/wiki/' + encodeURIComponent(wiki);
+  }
+
+  // Wikipedia のリード画像(1200px)URLを取得。例外は絶対に外へ漏らさない。
+  function fetchPhotoUrl(photo) {
+    if (!photo || !photo.wiki) return Promise.resolve(null);
+    if (photoUrlCache.has(photo.wiki)) return photoUrlCache.get(photo.wiki);
+    var task;
+    try {
+      task = fetch(wikiSummaryUrl(photo.wiki), { headers: { Accept: 'application/json' } })
+        .then(function (r) { return (r && r.ok) ? r.json() : null; })
+        .then(function (json) {
+          var src = json && json.thumbnail && json.thumbnail.source;
+          if (!src) return null;
+          var hi = src.replace('/320px-', '/1200px-');
+          // 実画像をプリロードし、読み込み成功時のみ採用
+          return new Promise(function (resolve) {
+            var pre = new Image();
+            pre.onload = function () { resolve(hi); };
+            pre.onerror = function () { resolve(null); };
+            pre.src = hi;
+          });
+        })
+        .catch(function () { return null; });
+    } catch (e) {
+      task = Promise.resolve(null);
+    }
+    photoUrlCache.set(photo.wiki, task);
+    return task;
+  }
+
+  // グラデ下地 + emoji (+caption) のサーフェスを生成
+  function buildPhotoSurface(photo, withCaption) {
+    var g = (photo && photo.grad && photo.grad.length >= 2) ? photo.grad : ['#2a2350', '#c96f4a'];
+    var surface = document.createElement('div');
+    surface.className = 'photo-surface';
+    surface.style.background = 'linear-gradient(145deg, ' + g[0] + ' 0%, ' + g[1] + ' 100%)';
+
+    var emoji = document.createElement('span');
+    emoji.className = 'photo-surface__emoji';
+    emoji.setAttribute('aria-hidden', 'true');
+    emoji.textContent = (photo && photo.emoji) || '📷';
+    surface.appendChild(emoji);
+
+    if (withCaption && photo && photo.caption) {
+      var cap = document.createElement('span');
+      cap.className = 'photo-surface__caption';
+      cap.textContent = photo.caption;
+      surface.appendChild(cap);
+    }
+    return surface;
+  }
+
+  // サーフェスに写真をフェードインで重ねる(取得成功時のみ)
+  function loadPhotoInto(surface, photo) {
+    fetchPhotoUrl(photo).then(function (url) {
+      if (!url || !surface || !surface.isConnected) return;
+      var img = document.createElement('img');
+      img.className = 'photo-surface__img';
+      img.alt = (photo.name || '') + (photo.place ? ' — ' + photo.place : '');
+      img.decoding = 'async';
+      img.loading = 'lazy';
+      var reveal = function () { img.classList.add('is-loaded'); };
+      img.addEventListener('load', reveal);
+      img.src = url; // プリロード済みのためキャッシュから即描画
+      if (img.complete) requestAnimationFrame(reveal);
+      surface.appendChild(img);
+      surface.classList.add('has-photo');
+    }).catch(function () {});
+  }
+
+  // ギャラリーのフォトカードを生成
+  function buildGalleryCard(photo) {
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'photo-card';
+    card.setAttribute('role', 'listitem');
+    card.setAttribute('aria-label', (photo.name || '写真') + (photo.place ? '(' + photo.place + ')' : '') + ' を拡大表示');
+
+    var surface = buildPhotoSurface(photo, true);
+    card.appendChild(surface);
+
+    var scrim = document.createElement('div');
+    scrim.className = 'photo-card__scrim';
+    scrim.setAttribute('aria-hidden', 'true');
+    card.appendChild(scrim);
+
+    var meta = document.createElement('div');
+    meta.className = 'photo-card__meta';
+    meta.innerHTML =
+      '<span class="photo-card__name">' + esc(photo.name || '') + '</span>' +
+      (photo.place ? '<span class="photo-card__place">' + esc(photo.place) + '</span>' : '');
+    card.appendChild(meta);
+
+    card._photo = photo;
+    card._surface = surface;
+    card.addEventListener('click', function () { openLightbox(photo); });
+    return card;
+  }
+
+  function renderGallery() {
+    var section = $('#gallerySection');
+    var mount = $('#photoGallery');
+    if (!section || !mount) return;
+    if (!PHOTOS.length) { section.hidden = true; return; } // 未定義なら非表示
+    section.hidden = false;
+    mount.innerHTML = '';
+
+    var cards = PHOTOS.map(function (photo, i) {
+      var card = buildGalleryCard(photo);
+      card.style.animationDelay = Math.min(i * 40, 360) + 'ms';
+      mount.appendChild(card);
+      return card;
+    });
+
+    // ビューポートに入ってから fetch を開始(IO非対応なら即時)
+    var start = function () { cards.forEach(function (c) { loadPhotoInto(c._surface, c._photo); }); };
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries, obs) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { obs.disconnect(); start(); }
+        });
+      }, { rootMargin: '200px' });
+      io.observe(section);
+    } else {
+      start();
+    }
+  }
+
+  // --- ライトボックス(写真拡大 + 出典) ---
+  var lightbox = $('#lightbox');
+  var lbStage = $('#lightboxStage');
+  var lbCaption = $('#lightboxCaption');
+  var lbLastFocused = null;
+
+  function openLightbox(photo) {
+    if (!lightbox || !lbStage || !lbCaption) return;
+    lbLastFocused = document.activeElement;
+
+    lbStage.innerHTML = '';
+    var surface = buildPhotoSurface(photo, false);
+    lbStage.appendChild(surface);
+    loadPhotoInto(surface, photo);
+
+    lbCaption.innerHTML =
+      '<h2 class="lightbox__name" id="lightboxTitle">' + esc(photo.name || '') + '</h2>' +
+      (photo.place ? '<p class="lightbox__place">' + esc(photo.place) + '</p>' : '') +
+      (photo.caption ? '<p class="lightbox__text">' + esc(photo.caption) + '</p>' : '') +
+      (photo.wiki ?
+        '<p class="lightbox__source">画像: <a href="' + esc(wikiPageUrl(photo.wiki)) +
+          '" target="_blank" rel="noopener">Wikipedia より</a></p>' : '');
+
+    lightbox.hidden = false;
+    document.body.style.overflow = 'hidden';
+    var closeBtn = $('.lightbox__close', lightbox);
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeLightbox() {
+    if (!lightbox || lightbox.hidden) return;
+    lightbox.hidden = true;
+    if (!modal || modal.hidden) document.body.style.overflow = ''; // モーダルと共有のため
+    if (lbStage) lbStage.innerHTML = '';
+    if (lbLastFocused && lbLastFocused.focus) lbLastFocused.focus();
+  }
+
+  if (lightbox) {
+    $$('[data-lb-close]', lightbox).forEach(function (el) { el.addEventListener('click', closeLightbox); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLightbox(); });
+  }
+
+  // =========================================================
   // ユーティリティ
   // =========================================================
   function esc(s) {
@@ -448,6 +643,7 @@
     renderPhraseList();
     renderCultureChips();
     renderCultureList();
+    renderGallery();
     navigate('home');
   }
 
