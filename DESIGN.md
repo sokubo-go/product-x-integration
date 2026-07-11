@@ -102,6 +102,30 @@ window.CULTURE_DATA = [
 ]
 ```
 
+### `data/photos.js`
+
+```js
+window.PHOTOS_DATA = [
+  {
+    id: "eiffel",
+    wiki: "Eiffel_Tower",        // 英語版 Wikipedia のページタイトル(URLエンコード前)
+    name: "エッフェル塔",
+    place: "パリ",
+    caption: "夕暮れ、シャン・ド・マルスの芝生から見上げる鉄の貴婦人",
+    emoji: "🗼",                  // フォールバックタイル用
+    grad: ["#2a2350", "#c96f4a"], // フォールバックタイルのグラデーション2色
+    cultureId: null               // 文化記事と紐づく場合はその id
+  }
+]
+```
+
+写真の実体は同梱しない。閲覧時に Wikipedia REST API
+(`https://en.wikipedia.org/api/rest_v1/page/summary/<wiki>`、CORS 対応)から
+リード画像を取得し、`thumbnail.source` の `/320px-` を `/1200px-` に置換して表示。
+取得失敗・オフライン時は grad + emoji + caption のタイルが常に下地として表示され、
+アプリは決して壊れて見えない。ライトボックスには出典として Wikipedia 記事への
+リンクを必ず表示する。
+
 ### `js/quiz.js`
 
 ```js
