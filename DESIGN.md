@@ -142,6 +142,90 @@ window.Quiz = {
 - ベストスコアを localStorage(`voyage.quiz.best`)に保存
 - スタイルは CSS 変数契約に従い、`.quiz-root` スコープで `<style>` を自己注入
 
+## 観光ガイド(guide.html)
+
+現地を歩きながら使う1日観光ガイド。ヴェルサイユ宮殿(パスポートチケット=全域アクセス前提)、
+コンコルド広場、シャンゼリゼ、凱旋門。本体アプリと同じデザインシステムを継承しつつ、
+「読み物」ではなく「現地での相棒」として設計する。
+
+### 体験設計の原則
+
+1. **順路が主役**: スポットごとに歩く順のストップカード列。「いま目の前にあるもの」単位
+2. **3層の情報密度**: ①ヘッドライン1行(歩きながら) → ②見どころ箇条書き(立ち止まって30秒) → ③物語・歴史(ベンチで2分)。③は折りたたみで既定は閉
+3. **チェックオフ**: 各ストップに「見た✓」。進捗が残る(localStorage voyage.guide.visited)。旅の達成感を演出
+4. **片手・屋外**: 大きなタップ領域、高コントラスト、スティッキーなスポット内ナビ、日光下でも読める配色
+5. **オフライン完全動作**: 全テキスト同梱。写真は Wikipedia から遅延読み込み(失敗時はグラデーションタイル)
+6. **正確性**: 料金・開館時間など変動する情報は断定せず「公式サイト要確認」と添える。歴史的事実は確度の高いもののみ
+
+### ファイル
+
+| ファイル | 内容 | 担当 |
+|---|---|---|
+| `guide.html` + `css/guide.css` + `js/guide.js` | ガイドUIシェル | Opus |
+| `data/guide-versailles.js` | ヴェルサイユ深掘りコンテンツ | Opus |
+| `data/guide-paris.js` | コンコルド広場・シャンゼリゼ・凱旋門 + 1日プラン | Sonnet |
+
+読み込み順: guide-versailles.js → guide-paris.js → guide.js
+
+### データ契約
+
+```js
+// data/guide-versailles.js
+window.GUIDE_SPOTS = window.GUIDE_SPOTS || [];
+window.GUIDE_SPOTS.push({
+  id: "versailles",
+  order: 1,                        // 表示順
+  name: "ヴェルサイユ宮殿",
+  fr: "Château de Versailles",
+  icon: "👑",
+  accent: "#8a6d1f",               // このスポットの章テーマ色(金)
+  wiki: "Palace_of_Versailles",    // ヒーロー写真用 Wikipedia(en)タイトル
+  tagline: "太陽王が世界に見せつけた、絶対王政の頂点",
+  intro: ["導入 2〜3段落。到着した瞬間の気分を高める文章"],
+  practical: [                     // 実用情報カード(5〜8個)
+    { icon: "🚆", title: "行き方", body: "..." }
+  ],
+  phrases: [ { fr: "...", ja: "...", kana: "..." } ],  // この場所で使う一言(3〜5)
+  route: [                         // ストップカード(順路)
+    {
+      id: "chapelle",              // スポット内で一意
+      name: "王室礼拝堂",
+      fr: "Chapelle royale",
+      wiki: null,                  // 任意: ストップ個別写真の Wikipedia タイトル
+      duration: "10分",
+      headline: "ルイ14世が晩年毎朝通った、天と地をつなぐ白と金の空間",
+      look: ["見るべき点を3〜6個。視線の誘導(天井/床/右手の…)を具体的に"],
+      story: ["歴史・人物・事件の物語 2〜4段落。ここでしか語れない濃度で"],
+      tips: ["混雑回避・撮影・豆知識など 1〜3個"],
+      photoSpot: "ベストな撮影位置と構図(任意)"
+    }
+  ]
+});
+
+// data/guide-paris.js — 同形式で concorde / champs / arc の3スポットを push。
+// さらに1日プラン:
+window.GUIDE_DAY = {
+  title: "今日のプラン",
+  intro: "1〜2文",
+  plan: [
+    { time: "午前", title: "ヴェルサイユ宮殿", note: "一言", spotId: "versailles" }
+  ]
+};
+```
+
+### guide.html の構成(Opus)
+
+- カバー(日付なしの普遍的なヒーロー)→ 1日プラン(タイムライン)→ スポット章 ×4
+- スポット章: 写真ヒーロー / intro / practical(横スクロールカード)/ フレーズ(音声ボタン付き、
+  speechSynthesis fr-FR)/ 順路ストップカード列
+- ストップカード: 番号 + name + duration + headline 常時表示。「見どころ」「物語」は
+  アコーディオン(見どころは既定開、物語は既定閉)。✓ボタンで visited トグル
+- 上部に横スクロールのスポットジャンプナビ(sticky)。スポット内の進捗 n/m 表示
+- 写真読み込みは app.js と同じ方式(Wikipedia REST summary、フォールバックはグラデーション+絵文字)を
+  guide.js 内に自己完結で実装
+- index.html のホーム導線に guide.html へのリンクカードを1枚追加(既存を壊さない)
+- テーマ(voyage.theme)・デザイントークンは本体と共有。ライト/ダーク両対応。reduced-motion 配慮
+
 ## 検証
 
 Playwright(内蔵 Chromium)で実際に開き、全タブ・音声ボタン・クイズ一巡・
