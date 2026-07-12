@@ -364,6 +364,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .speak-btn.is-speaking::after { animation-delay: .55s; }
 @keyframes ripple { 0% { transform: scale(1); opacity: .55; } 100% { transform: scale(1.7); opacity: 0; } }
 
+/* --- 見せるカードボタン(音声ボタンと同じ操作列の丸ボタン) --- */
+.show-btn {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--surface); display: grid; place-items: center; font-size: 1.12rem; line-height: 1;
+  transition: transform .2s var(--ease), border-color .25s, background-color .25s, box-shadow .25s;
+}
+.show-btn:hover { transform: scale(1.08); border-color: var(--gold); background: var(--gold-soft); }
+
 /* --- お気に入りトグル --- */
 .fav-btn {
   flex: none; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line);
@@ -553,6 +561,47 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .modal__phrase-fr { font-family: var(--serif); font-size: 1.35rem; font-weight: 700; margin: 0; }
 .modal__phrase-ja { margin: 4px 0 0; }
 .modal__phrase-kana { margin: 2px 0 0; color: var(--ink-soft); font-size: .86rem; }
+
+/* =========================================================
+   見せるカード(全画面オーバーレイ)
+   落ち着いた無地の下地に、仏語をセリフ体で特大表示。
+   ========================================================= */
+.showcard {
+  position: fixed; inset: 0; z-index: 340;
+  background: var(--surface);
+  display: flex; flex-direction: column; overflow: hidden;
+  animation: fadeIn .18s var(--ease) both;
+}
+.showcard[hidden] { display: none; }
+.showcard__close {
+  position: absolute; top: 16px; right: 16px; z-index: 2;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
+  display: grid; place-items: center; font-size: 1.05rem;
+  transition: transform .2s var(--ease), color .2s, border-color .2s;
+}
+.showcard__close:hover { transform: rotate(90deg); color: var(--accent-2); border-color: var(--accent-2); }
+.showcard__inner {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: 22px;
+  padding: clamp(48px, 8vw, 96px) clamp(20px, 5vw, 60px) clamp(32px, 6vw, 60px);
+}
+.showcard__fr {
+  font-family: var(--serif); font-weight: 700; color: var(--ink);
+  line-height: 1.14; letter-spacing: .005em; margin: 0; max-width: 100%;
+  font-size: clamp(2.2rem, 12vw, 8rem);       /* JSで文字数に応じて微調整 */
+  overflow-wrap: normal; word-break: normal; /* 単語は途中で切らず、JSの縮小で収める */
+}
+.showcard__fr.is-clamped { overflow-wrap: break-word; } /* 最小サイズでも収まらない超長語のみ途中改行を許可 */
+.showcard__ja {
+  margin: 0; max-width: 42ch; color: var(--ink-soft);
+  font-size: clamp(1rem, 3.6vw, 1.5rem);
+}
+.showcard__hint {
+  margin: 6px 0 0; font-size: .84rem; color: var(--ink-soft);
+  padding: 8px 16px; border-radius: 999px; background: var(--accent-soft);
+}
 
 /* =========================================================
    クイズ マウント

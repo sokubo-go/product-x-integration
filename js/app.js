@@ -99,6 +99,17 @@
     return b;
   }
 
+  // 見せるカードを開くボタン要素を生成
+  function makeShowBtn(fr, ja) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'show-btn';
+    b.setAttribute('aria-label', 'カードを見せる');
+    b.textContent = '🪧';
+    b.addEventListener('click', function (e) { e.stopPropagation(); showCard(fr, ja); });
+    return b;
+  }
+
   // =========================================================
   // お気に入り (localStorage: voyage.favs)
   // =========================================================
@@ -152,6 +163,7 @@
     var actions = document.createElement('div');
     actions.className = 'daily__actions';
     actions.appendChild(makeSpeakBtn(p.fr));
+    actions.appendChild(makeShowBtn(p.fr, p.ja));
 
     card.appendChild(quote); card.appendChild(body); card.appendChild(actions);
     mount.innerHTML = ''; mount.appendChild(card);
@@ -228,6 +240,7 @@
       var actions = document.createElement('div');
       actions.className = 'phrase-card__actions';
       actions.appendChild(makeSpeakBtn(p.fr));
+      actions.appendChild(makeShowBtn(p.fr, p.ja));
 
       var favBtn = document.createElement('button');
       favBtn.type = 'button';
@@ -626,6 +639,102 @@
   }
 
   // =========================================================
+  // 見せるカード(全画面オーバーレイ)
+  //   発音に自信がなくても、フレーズを店員に「見せるだけ」で伝える。
+  //   仏語を特大表示 → 日本語訳 → 案内。タップ/Escで閉じる。
+  // =========================================================
+  var showcardEl = null, showcardFr = null, showcardJa = null, showcardInner = null;
+  var showcardLastFocused = null;
+
+  function buildShowcard() {
+    if (showcardEl) return;
+    showcardEl = document.createElement('div');
+    showcardEl.id = 'showcard';
+    showcardEl.className = 'showcard';
+    showcardEl.setAttribute('role', 'dialog');
+    showcardEl.setAttribute('aria-modal', 'true');
+    showcardEl.setAttribute('aria-label', '見せるカード');
+    showcardEl.hidden = true;
+
+    var closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'showcard__close';
+    closeBtn.setAttribute('aria-label', '閉じる');
+    closeBtn.textContent = '✕';
+
+    showcardInner = document.createElement('div');
+    showcardInner.className = 'showcard__inner';
+
+    showcardFr = document.createElement('p');
+    showcardFr.className = 'showcard__fr';
+    showcardJa = document.createElement('p');
+    showcardJa.className = 'showcard__ja';
+    var hint = document.createElement('p');
+    hint.className = 'showcard__hint';
+    hint.textContent = 'この画面をお店の人に見せてください 🙂';
+
+    showcardInner.appendChild(showcardFr);
+    showcardInner.appendChild(showcardJa);
+    showcardInner.appendChild(hint);
+    showcardEl.appendChild(closeBtn);
+    showcardEl.appendChild(showcardInner);
+    document.body.appendChild(showcardEl);
+
+    // どこをタップしても閉じる(×ボタンのクリックもここへ伝播)
+    showcardEl.addEventListener('click', closeShowcard);
+  }
+
+  // 仏語が画面からはみ出さないよう、収まるまでフォントを縮める(最大4行程度)
+  function fitShowcard() {
+    if (!showcardEl || showcardEl.hidden || !showcardFr || !showcardInner) return;
+    var size = Math.min(window.innerWidth / 4.2, window.innerHeight / 3.2, 176);
+    size = Math.max(size, 30);
+    showcardFr.classList.remove('is-clamped');
+    showcardFr.style.fontSize = size + 'px';
+    var guard = 90;
+    while (guard-- > 0 && size > 26 &&
+           (showcardInner.scrollHeight > showcardInner.clientHeight ||
+            showcardFr.scrollWidth > showcardFr.clientWidth)) {
+      size -= 3;
+      showcardFr.style.fontSize = size + 'px';
+    }
+    // それでも横に溢れる超長語だけは途中改行を許可
+    if (showcardFr.scrollWidth > showcardFr.clientWidth) showcardFr.classList.add('is-clamped');
+  }
+
+  function showCard(fr, ja) {
+    fr = fr == null ? '' : String(fr);
+    ja = ja == null ? '' : String(ja);
+    if (!fr && !ja) return;
+    buildShowcard();
+    showcardLastFocused = document.activeElement;
+    showcardFr.textContent = fr;
+    showcardJa.textContent = ja;
+    showcardJa.style.display = ja ? '' : 'none';
+    showcardEl.hidden = false;
+    document.body.style.overflow = 'hidden';
+    fitShowcard();
+    var cb = showcardEl.querySelector('.showcard__close');
+    if (cb) { try { cb.focus(); } catch (e) {} }
+  }
+
+  function closeShowcard() {
+    if (!showcardEl || showcardEl.hidden) return;
+    showcardEl.hidden = true;
+    // 多重ロック配慮: 他のオーバーレイが開いていなければ解除
+    if ((!modal || modal.hidden) && (!lightbox || lightbox.hidden)) {
+      document.body.style.overflow = '';
+    }
+    if (showcardLastFocused && showcardLastFocused.focus) {
+      try { showcardLastFocused.focus(); } catch (e) {}
+    }
+  }
+
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeShowcard(); });
+  window.addEventListener('resize', function () { if (showcardEl && !showcardEl.hidden) fitShowcard(); });
+  window.addEventListener('orientationchange', function () { if (showcardEl && !showcardEl.hidden) fitShowcard(); });
+
+  // =========================================================
   // ユーティリティ
   // =========================================================
   function esc(s) {
@@ -662,6 +771,7 @@
     setTheme: setTheme,       // ('light'|'dark') => void
     toggleFav: toggleFav,     // (key) => boolean
     isFav: isFav,             // (key) => boolean
+    showCard: showCard,       // (fr, ja) => void  見せるカードを開く
     refresh: init             // データ後読み込み時などに再描画
   };
 })();
