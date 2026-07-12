@@ -443,3 +443,229 @@
   .photo-surface__img { transition: none; }
   .practical, .spotnav__inner { scroll-snap-type: none; }
 }
+
+/* =========================================================
+   全体マップ(versailles-map.js が挿入)
+   フランス式庭園の平面図。ライト=昼の庭 / ダーク=夜の庭園。
+   配色トークンは .vmap にスコープ。SVG は width:100% でレスポンシブ。
+   ========================================================= */
+.vmap-wrap {
+  margin: 6px 0 4px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.vmap-summary {
+  display: flex; align-items: center; gap: 10px; cursor: pointer; list-style: none;
+  min-height: 48px; padding: 8px 16px; font-weight: 750; font-size: 1.02rem; color: var(--ink);
+}
+.vmap-summary::-webkit-details-marker { display: none; }
+.vmap-summary__ic { font-size: 1.2rem; }
+.vmap-summary__label { flex: 1; font-family: var(--serif); }
+.vmap-summary__hint {
+  font-size: .74rem; font-weight: 700; color: var(--ink-soft);
+  background: var(--accent-soft); padding: 3px 10px; border-radius: 999px;
+}
+.vmap-summary::after {
+  content: "⌄"; font-size: 1.2rem; color: var(--ink-soft);
+  transition: transform .3s var(--ease);
+}
+.vmap-wrap[open] .vmap-summary::after { transform: rotate(180deg); }
+.vmap-body {
+  padding: 4px 12px 14px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--gold-soft) 60%, transparent), transparent 70%);
+}
+
+/* --- SVG 本体 + テーマトークン --- */
+.vmap {
+  display: block; width: 100%; height: auto; margin: 0 auto;
+  max-width: 480px;
+  /* 昼の庭 */
+  --vmap-ground: #e9dec4;
+  --vmap-ground-2: #e3d6b8;
+  --vmap-water: #96bad9;
+  --vmap-water-edge: #6f9cc2;
+  --vmap-lawn: #a9c67e;
+  --vmap-hedge: #7a9a5f;
+  --vmap-hedge2: #6d8d54;
+  --vmap-tree: #4f6d3c;
+  --vmap-stone: #f3ead6;
+  --vmap-roof: #9a9ab6;
+  --vmap-ink: #6a5f45;
+  --vmap-line: rgba(120,95,40,.34);
+  --vmap-gold: #bd943a;
+  --vmap-gold-bright: #e8c258;
+  --vmap-route: #b28a2e;
+  --vmap-axis: rgba(150,120,45,.5);
+  --vmap-frame: #cdb37c;
+  --vmap-frame-in: rgba(120,95,40,.4);
+  --vmap-pin-face: #fbf3dd;
+  --vmap-pin-ink: #7a5c17;
+  --vmap-court: #ded0b0;
+  --vmap-am-water-bg: #cfe6f4;
+  --vmap-am-shade-bg: #cfe3b8;
+  --vmap-am-edge: rgba(90,70,30,.35);
+}
+[data-theme="dark"] .vmap {
+  /* 夜の庭園 */
+  --vmap-ground: #191d2e;
+  --vmap-ground-2: #141826;
+  --vmap-water: #172a4c;
+  --vmap-water-edge: #315586;
+  --vmap-lawn: #2b482d;
+  --vmap-hedge: #26402a;
+  --vmap-hedge2: #1f3623;
+  --vmap-tree: #35583a;
+  --vmap-stone: #302e42;
+  --vmap-roof: #464364;
+  --vmap-ink: #c3bcd0;
+  --vmap-line: rgba(200,192,225,.20);
+  --vmap-gold: #d3ab48;
+  --vmap-gold-bright: #f1d477;
+  --vmap-route: #d0a94a;
+  --vmap-axis: rgba(220,190,110,.34);
+  --vmap-frame: #4c496a;
+  --vmap-frame-in: rgba(210,200,235,.22);
+  --vmap-pin-face: #221f36;
+  --vmap-pin-ink: #ecc766;
+  --vmap-court: #1d2132;
+  --vmap-am-water-bg: #17324a;
+  --vmap-am-shade-bg: #1e3a24;
+  --vmap-am-edge: rgba(210,200,235,.28);
+}
+
+/* 塗り */
+.vmap-ground { fill: var(--vmap-ground); }
+.vmap-ground--2 { fill: var(--vmap-ground-2); }
+.vmap-water { fill: var(--vmap-water); stroke: var(--vmap-water-edge); stroke-width: 1; }
+.vmap-water-dot { fill: var(--vmap-water-edge); opacity: .7; }
+.vmap-lawn { fill: var(--vmap-lawn); }
+.vmap-hedge { fill: var(--vmap-hedge); }
+.vmap-hedge2 { fill: var(--vmap-hedge2); }
+.vmap-tree { fill: var(--vmap-tree); }
+.vmap-grit { fill: var(--vmap-ground-2); }
+.vmap-grit-dot { fill: var(--vmap-line); }
+.vmap-scroll { fill: none; stroke: var(--vmap-hedge2); stroke-width: 1.6; opacity: .85; }
+.vmap-scroll-dot { fill: var(--vmap-hedge2); }
+.vmap-alley { stroke: var(--vmap-ground-2); stroke-width: 2.4; }
+.vmap-stone { fill: var(--vmap-stone); stroke: var(--vmap-gold); stroke-width: 1.1; }
+.vmap-roof { fill: var(--vmap-roof); }
+.vmap-court { fill: var(--vmap-court); }
+.vmap-court-dot { fill: var(--vmap-line); opacity: .8; }
+.vmap-gold-line { stroke: var(--vmap-gold); stroke-width: 1.4; }
+.vmap-grille { stroke: var(--vmap-gold-bright); stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 1.5 3; }
+.vmap-floor line { stroke: var(--vmap-line); stroke-width: 1; }
+.vmap-hall {
+  fill: color-mix(in srgb, var(--vmap-gold) 26%, var(--vmap-stone));
+  stroke: var(--vmap-gold); stroke-width: 1.1;
+}
+
+/* 額縁・タイトル・仕切り */
+.vmap-frame { fill: none; }
+.vmap-frame--out { stroke: var(--vmap-frame); stroke-width: 2; }
+.vmap-frame--in { stroke: var(--vmap-frame-in); stroke-width: 1; }
+.vmap-title { fill: var(--vmap-ink); font-family: var(--serif); font-size: 16px; font-weight: 700; letter-spacing: .04em; }
+.vmap-title--sm { font-size: 10px; opacity: .6; }
+.vmap-rule { stroke: var(--vmap-gold); stroke-width: 1; opacity: .8; }
+.vmap-divider { stroke: var(--vmap-line); stroke-width: 1; stroke-dasharray: 3 4; }
+.vmap-axis { stroke: var(--vmap-axis); stroke-width: 1.4; stroke-dasharray: 2 5; }
+.vmap-path { fill: none; stroke: var(--vmap-route); stroke-width: 1.6; stroke-dasharray: 1.5 4; stroke-linecap: round; opacity: .7; }
+
+/* 順路(点線) */
+.vmap-route { fill: none; stroke: var(--vmap-route); stroke-width: 2.4; stroke-dasharray: 2 6; stroke-linecap: round; }
+
+/* ラベル */
+.vmap-label { fill: var(--vmap-ink); font-size: 11px; font-weight: 650; font-family: inherit; }
+.vmap-label--sm { font-size: 9.5px; font-weight: 600; }
+.vmap-label--sec { font-size: 11px; font-weight: 750; fill: var(--vmap-gold); letter-spacing: .02em; }
+.vmap-label--ctr { text-anchor: middle; }
+.vmap-label--end { text-anchor: end; }
+.vmap-label--water { fill: var(--vmap-water-edge); }
+.vmap-label--onstone { fill: #4a3a12; font-size: 9.5px; font-weight: 750; }
+[data-theme="dark"] .vmap-label--onstone { fill: var(--vmap-gold-bright); }
+
+/* コンパス */
+.vmap-compass line { stroke: var(--vmap-ink); stroke-width: 1.3; }
+.vmap-compass-head { fill: var(--vmap-ink); }
+.vmap-compass-hub { fill: var(--vmap-gold); }
+.vmap-compass-t { fill: var(--vmap-ink); font-size: 9px; font-weight: 700; }
+
+/* アメニティ(装飾レイヤー・非タップ) */
+.vmap-am { pointer-events: none; }
+.vmap-am__disc { stroke: var(--vmap-am-edge); stroke-width: .8; }
+.vmap-am--water .vmap-am__disc { fill: var(--vmap-am-water-bg); }
+.vmap-am--shade .vmap-am__disc { fill: var(--vmap-am-shade-bg); }
+.vmap-am__gl { font-size: 9px; text-anchor: middle; dominant-baseline: central; }
+
+/* 番号ピン */
+.vmap-pin { cursor: pointer; }
+.vmap-pin__disc {
+  fill: var(--vmap-pin-face); stroke: var(--vmap-gold); stroke-width: 1.7;
+  filter: drop-shadow(0 1px 1.4px rgba(20,16,8,.3));
+  transition: stroke-width .18s var(--ease);
+}
+.vmap-pin__num {
+  fill: var(--vmap-pin-ink); font-size: 12px; font-weight: 800;
+  text-anchor: middle; dominant-baseline: central;
+  font-family: system-ui, sans-serif;
+}
+.vmap-pin__halo { fill: none; stroke: var(--vmap-gold-bright); stroke-width: 2; opacity: 0; }
+.vmap-pin.is-visited .vmap-pin__disc { fill: var(--vmap-gold-bright); stroke: var(--vmap-gold); }
+.vmap-pin.is-visited .vmap-pin__num { fill: #3a2b06; }
+.vmap-pin.is-visited .vmap-pin__halo { opacity: .85; animation: vmapPulse 2.4s var(--ease) infinite; }
+.vmap-pin:hover .vmap-pin__disc { stroke-width: 2.6; }
+.vmap-pin:focus-visible { outline: none; }
+.vmap-pin:focus-visible .vmap-pin__halo { opacity: 1; }
+@keyframes vmapPulse {
+  0%, 100% { opacity: .85; stroke-width: 2; }
+  50% { opacity: .3; stroke-width: 3.4; }
+}
+
+/* 凡例 + 注記 */
+.vmap-legend {
+  display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: center;
+  margin: 12px auto 0; max-width: 480px;
+}
+.vmap-legend__i {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .82rem; color: var(--ink-soft); font-weight: 600;
+}
+.vmap-legend__pin {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: grid; place-items: center; font-size: .72rem; font-weight: 800;
+  background: var(--surface); border: 1.6px solid var(--gold); color: var(--gold);
+}
+.vmap-legend__pin--on { background: var(--gold); color: #3a2b06; border-color: var(--gold); }
+[data-theme="dark"] .vmap-legend__pin--on { color: #241804; }
+.vmap-legend__am {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: grid; place-items: center; font-size: .72rem;
+  border: 1px solid var(--line);
+}
+.vmap-legend__am--water { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+.vmap-legend__am--shade { background: color-mix(in srgb, #4f6d3c 18%, var(--surface)); }
+.vmap-note {
+  margin: 10px auto 2px; max-width: 480px; text-align: center;
+  font-size: .8rem; line-height: 1.6; color: var(--ink-soft);
+}
+
+/* 順路カードの一瞬ハイライト(ピンから飛んだ先) */
+.stop.vmap-flash {
+  animation: vmapFlash 1.5s var(--ease);
+  border-color: var(--gold);
+}
+@keyframes vmapFlash {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold) 70%, transparent); }
+  18% { box-shadow: 0 0 0 3px var(--gold), 0 10px 28px color-mix(in srgb, var(--gold) 46%, transparent); }
+  60% { box-shadow: 0 0 0 3px var(--gold), 0 10px 28px color-mix(in srgb, var(--gold) 40%, transparent); }
+  100% { box-shadow: var(--shadow); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vmap-pin.is-visited .vmap-pin__halo { animation: none; opacity: .85; }
+  .vmap-pin__disc { transition: none; }
+  .stop.vmap-flash { animation: none; box-shadow: 0 0 0 3px var(--gold); }
+}
