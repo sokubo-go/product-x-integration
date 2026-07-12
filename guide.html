@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Voyage 観光ガイド — ヴェルサイユとパリを歩く、片手の相棒。順路・見どころ・物語・使える一言。">
+  <meta name="color-scheme" content="light dark">
+  <title>今日の観光ガイド — Voyage</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🗺️%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/guide.css">
+  <!-- テーマのちらつき防止: 描画前に保存済みテーマを適用(index.html と同一) -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('voyage.theme');
+        if (!t) {
+          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body class="guide">
+  <a class="skip-link" href="#main">本文へスキップ</a>
+
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <div class="app-header__inner">
+      <a class="brand" href="index.html" aria-label="Voyage アプリへ">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 40" width="18" height="30" fill="currentColor" role="img">
+            <path d="M12 0c.5 3.4 1.3 5.6 2.4 7.2h-1.5l.4 3.1h-.9l1.6 9.4h1.2v2H14l2.4 16.9h-2.6l-.7-6.6c-.1-.7-.5-1-.9-1h-.4c-.4 0-.8.3-.9 1l-.7 6.6H7.6L10 21.7H8.8v-2H10l1.6-9.4h-.9l.4-3.1H9.6C10.7 5.6 11.5 3.4 12 0zm-1.1 24.3l-1 7.1h4.2l-1-7.1c-.1-.5-.4-.8-.8-.8h-.6c-.4 0-.7.3-.8.8z"/>
+          </svg>
+        </span>
+        <span class="brand__text">
+          <span class="brand__name">Voyage</span>
+          <span class="brand__sub">観光ガイド</span>
+        </span>
+      </a>
+
+      <a class="guide-back" href="index.html">
+        <span aria-hidden="true">←</span><span class="guide-back__label">アプリへ</span>
+      </a>
+
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="テーマ切替" title="ライト / ダーク切替">
+        <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">☀️</span>
+        <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- スティッキー: スポットジャンプ + 進捗 -->
+  <nav class="spotnav" id="spotNav" aria-label="スポットへジャンプ" hidden>
+    <div class="spotnav__inner" id="spotNavInner"></div>
+  </nav>
+
+  <main id="main" class="guide-main" tabindex="-1">
+
+    <!-- カバー(普遍的ヒーロー) -->
+    <section class="cover" aria-label="今日の観光ガイド">
+      <div class="cover__sky" aria-hidden="true">
+        <span class="cover__sun"></span>
+        <svg class="cover__arc" viewBox="0 0 200 150" preserveAspectRatio="xMidYMax meet" role="img" aria-label="凱旋門のシルエット">
+          <path fill-rule="evenodd" d="M28 150 L28 34 Q28 22 40 22 L160 22 Q172 22 172 34 L172 150 L146 150 L146 132 L54 132 L54 150 Z
+            M70 150 L70 78 Q70 50 100 50 Q130 50 130 78 L130 150 L118 150 L118 80 Q118 62 100 62 Q82 62 82 80 L82 150 Z"/>
+          <rect x="54" y="40" width="92" height="9" rx="2"/>
+          <rect x="60" y="112" width="80" height="7" rx="2"/>
+        </svg>
+      </div>
+      <div class="cover__content">
+        <p class="cover__eyebrow">Guide du jour</p>
+        <h1 class="cover__title"><span>今日、パリは</span><br><span>あなたのもの。</span></h1>
+        <p class="cover__lead">地図とチケットと、この一冊を片手に。ヴェルサイユの黄金からシャンゼリゼの夕暮れまで、目の前のひとつひとつを、順路のとおりに歩いていきましょう。</p>
+        <div class="cover__hint" aria-hidden="true">
+          <span class="cover__hint-chev">⌄</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1日プラン(タイムライン) -->
+    <section class="section dayplan" id="dayPlan" aria-label="今日のプラン"></section>
+
+    <!-- スポット章(GUIDE_SPOTS を order 順に描画) -->
+    <div id="spots"></div>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>Voyage — 旅するフランス語 · 良い一日を。<span class="app-footer__fr">Bonne journée !</span></p>
+  </footer>
+
+  <!-- データ → ガイド本体 の順(DESIGN.md 準拠) -->
+  <script src="data/guide-versailles.js"></script>
+  <script src="data/guide-paris.js"></script>
+  <script src="js/guide.js"></script>
+</body>
+</html>
