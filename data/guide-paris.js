@@ -38,7 +38,7 @@ window.GUIDE_SPOTS.push({
       id: "obelisque",
       name: "ルクソールのオベリスク",
       fr: "Obélisque de Louxor",
-      wiki: null,
+      wiki: "Luxor_Obelisk",
       duration: "10分",
       headline: "3300年前にラムセス2世が刻んだ石が、パリのど真ん中で空を突く",
       look: [
@@ -62,7 +62,7 @@ window.GUIDE_SPOTS.push({
       id: "revolution",
       name: "広場の記憶 — 革命広場から調和の広場へ",
       fr: "Place de la Révolution",
-      wiki: null,
+      wiki: "Execution_of_Louis_XVI",
       duration: "10分",
       headline: "国王のための広場が、国王を処刑する広場になった",
       look: [
@@ -85,7 +85,7 @@ window.GUIDE_SPOTS.push({
       id: "fontaines",
       name: "海と川、ふたつの噴水",
       fr: "Fontaine des Mers et Fontaine des Fleuves",
-      wiki: null,
+      wiki: "Fontaines_de_la_Concorde",
       duration: "5分",
       headline: "南は海の恵み、北は川の恵み。ふたつの噴水がフランスの豊かさを謳う",
       look: [
@@ -107,7 +107,7 @@ window.GUIDE_SPOTS.push({
       id: "axe-historique",
       name: "歴史の軸線 — 凱旋門とルーヴルを結ぶ一直線",
       fr: "L'axe historique",
-      wiki: null,
+      wiki: "Axe_historique",
       duration: "10分",
       headline: "この場所に立つだけで、パリ300年の都市計画が一望できる",
       look: [
@@ -129,7 +129,7 @@ window.GUIDE_SPOTS.push({
       id: "tuileries",
       name: "チュイルリー庭園への入口",
       fr: "Jardin des Tuileries",
-      wiki: null,
+      wiki: "Tuileries_Garden",
       duration: "5分",
       headline: "広場から一歩東へ。パリで最も歴史ある王家の庭園がここから始まる",
       look: [
@@ -250,7 +250,7 @@ window.GUIDE_SPOTS.push({
       id: "cafes",
       name: "上半分 — 商業ゾーンとカフェ文化",
       fr: "Les Champs-Élysées côté boutiques",
-      wiki: null,
+      wiki: "Ladurée",
       duration: "20分",
       headline: "ロン・ポワンから先は一変、世界的ブランドと老舗カフェが軒を連ねる",
       look: [
@@ -328,7 +328,7 @@ window.GUIDE_SPOTS.push({
       id: "sculptures",
       name: "四本脚を飾る彫刻群",
       fr: "Les groupes sculptés",
-      wiki: null,
+      wiki: "François_Rude",
       duration: "10分",
       headline: "とりわけ『ラ・マルセイエーズ』の躍動感に足を止めたい",
       look: [
@@ -351,7 +351,7 @@ window.GUIDE_SPOTS.push({
       id: "tombe",
       name: "無名戦士の墓と灯火の再点火式",
       fr: "Tombe du Soldat inconnu",
-      wiki: null,
+      wiki: "Tomb_of_the_Unknown_Soldier_(France)",
       duration: "10分",
       headline: "門の真下、決して消えることのない炎が第一次世界大戦の記憶を灯し続ける",
       look: [
@@ -394,7 +394,7 @@ window.GUIDE_SPOTS.push({
       id: "terrasse",
       name: "屋上テラス — 12本の放射大通り",
       fr: "La terrasse sommitale",
-      wiki: null,
+      wiki: "Place_Charles_de_Gaulle",
       duration: "20〜30分",
       headline: "284段を登った先に、パリ随一の360度パノラマが待っている",
       look: [
@@ -420,7 +420,7 @@ window.GUIDE_SPOTS.push({
       id: "napoleon",
       name: "ナポレオンの物語 — 建設を命じた男は、完成した門を見なかった",
       fr: "Napoléon et l'Arc de Triomphe",
-      wiki: null,
+      wiki: "Napoleon",
       duration: "5分",
       headline: "1806年の勝利に沸く皇帝が命じた門は、彼の死後15年を経てようやく完成した",
       look: [

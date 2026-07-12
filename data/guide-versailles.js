@@ -68,7 +68,7 @@ window.GUIDE_SPOTS.push({
       id: "cour-honneur",
       name: "儀礼の中庭と黄金の門",
       fr: "Cour d'honneur & Grille royale",
-      wiki: null,
+      wiki: "Louis_XIV",
       duration: "15分",
       headline: "金色に輝く門の向こう、絶対王政がこちらを見下ろしている",
       look: [
@@ -94,7 +94,7 @@ window.GUIDE_SPOTS.push({
       id: "chapelle",
       name: "王室礼拝堂",
       fr: "Chapelle royale",
-      wiki: null,
+      wiki: "Chapels_of_Versailles",
       duration: "10分",
       headline: "白と金の柱が天へ伸びる、ルイ14世が最後に完成させた聖なる空間",
       look: [
@@ -120,7 +120,7 @@ window.GUIDE_SPOTS.push({
       id: "hercule",
       name: "ヘラクレスの間",
       fr: "Salon d'Hercule",
-      wiki: null,
+      wiki: "Salon_of_Hercules",
       duration: "10分",
       headline: "頭上いっぱいに神が昇天する、世界最大級の天井画",
       look: [
@@ -146,7 +146,7 @@ window.GUIDE_SPOTS.push({
       id: "appartement-1",
       name: "国王大居室 前半(豊穣・ヴィーナス・ディアナの間)",
       fr: "Grand Appartement du Roi (Abondance, Vénus, Diane)",
-      wiki: null,
+      wiki: "Grand_appartement_du_roi",
       duration: "12分",
       headline: "惑星の名を持つ7つの間——王の一日は神話の中で営まれた",
       look: [
@@ -198,7 +198,7 @@ window.GUIDE_SPOTS.push({
       id: "guerre",
       name: "戦争の間",
       fr: "Salon de la Guerre",
-      wiki: null,
+      wiki: "Salon_of_War",
       duration: "8分",
       headline: "馬上のルイ14世が敵を踏みしだく、鏡の回廊への劇的な前奏",
       look: [
@@ -278,7 +278,7 @@ window.GUIDE_SPOTS.push({
       id: "paix-reine",
       name: "平和の間・王妃の大居室",
       fr: "Salon de la Paix & Grand Appartement de la Reine",
-      wiki: null,
+      wiki: "Grand_appartement_de_la_reine",
       duration: "12分",
       headline: "戦争の間と対をなす平和の間から、王妃たちの華やかな世界へ",
       look: [
@@ -304,7 +304,7 @@ window.GUIDE_SPOTS.push({
       id: "chambre-reine",
       name: "王妃の寝室",
       fr: "Chambre de la Reine",
-      wiki: null,
+      wiki: "Marie_Antoinette",
       duration: "10分",
       headline: "王妃はこの部屋で公衆の面前で出産した——革命の朝、群衆もここへ迫った",
       look: [
@@ -330,7 +330,7 @@ window.GUIDE_SPOTS.push({
       id: "sacre",
       name: "戴冠の間",
       fr: "Salle du Sacre",
-      wiki: null,
+      wiki: "The_Coronation_of_Napoleon",
       duration: "8分",
       headline: "ダヴィッドが描いた巨大な戴冠式——王政の宮殿に皇帝が刻まれている",
       look: [
@@ -384,7 +384,7 @@ window.GUIDE_SPOTS.push({
       id: "grand-canal",
       name: "大運河",
       fr: "Grand Canal",
-      wiki: null,
+      wiki: "Grand_Canal_(Versailles)",
       duration: "20分",
       headline: "十字に伸びる水の大通り——王はここに艦隊を浮かべた",
       look: [
