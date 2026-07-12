@@ -226,6 +226,13 @@ window.GUIDE_DAY = {
 - index.html のホーム導線に guide.html へのリンクカードを1枚追加(既存を壊さない)
 - テーマ(voyage.theme)・デザイントークンは本体と共有。ライト/ダーク両対応。reduced-motion 配慮
 
+## 拡充ラウンド2
+
+1. **data/guide-seine.js**: 新スポット id "seine", order 5(セーヌ河岸と夜のパリ)。既存 GUIDE_SPOTS 契約のまま。guide.html に script タグを guide-paris.js の直後に追加
+2. **data/phrases.js 追記**: 既存配列に3カテゴリ push — numbers(数字・お金・時刻 🔢)/ smalltalk(会話をつなぐ一言 💬)/ romance(ふたりの旅 💐)。各9〜12句、既存契約と同形式
+3. **data/culture.js 追記**: 記事+6本(既存契約と同形式、id 重複禁止)
+4. **見せるカード**: フレーズカードに 🪧 ボタン → 全画面オーバーレイに仏語を特大表示(セリフ体・自動フィット)、下に日本語小さく、タップ/Escで閉じる。localStorage 不要。app.js + style.css のみ変更。guide.html のフレーズにも同ボタン(guide.js)…は今回見送り、本体のみ
+
 ## 検証
 
 Playwright(内蔵 Chromium)で実際に開き、全タブ・音声ボタン・クイズ一巡・
