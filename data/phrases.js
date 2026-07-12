@@ -511,5 +511,215 @@ window.PHRASES_DATA = [
         note: "男性は perdu、女性は perdue と発音は同じでも綴りが変わる"
       }
     ]
+  },
+  {
+    id: "numbers",
+    name: "数字・お金・時刻",
+    icon: "🔢",
+    description: "数える、払う、時間を尋ねる。旅の実務をスマートにこなす数字たち",
+    phrases: [
+      {
+        fr: "Un, deux, trois, quatre, cinq, six, sept, huit, neuf, dix.",
+        ja: "1、2、3、4、5、6、7、8、9、10",
+        kana: "アン ドゥ トロワ キャトル サンク シス セット ユイット ヌフ ディス",
+        note: "six と dix は単独では「シス」「ディス」。フランスでは指を折るとき親指から数え始めるのが一般的"
+      },
+      {
+        fr: "C'est combien, s'il vous plaît ?",
+        ja: "おいくらですか?",
+        kana: "セ コンビヤン シル ヴ プレ"
+      },
+      {
+        fr: "Est-ce que je peux payer par carte ?",
+        ja: "カードで払えますか?",
+        kana: "エス ク ジュ プ ペイエ パール カルト"
+      },
+      {
+        fr: "Seulement en espèces ?",
+        ja: "現金のみですか?",
+        kana: "スルマン アン ネスペス",
+        note: "小さなカフェや市場の屋台では今もカード不可・現金のみの店が残る"
+      },
+      {
+        fr: "Le reçu, s'il vous plaît.",
+        ja: "レシートをください",
+        kana: "ル ルス シル ヴ プレ"
+      },
+      {
+        fr: "On partage en deux ?",
+        ja: "半分こにできますか?",
+        kana: "オン パルタージュ アン ドゥ",
+        note: "支払いを割り勘にする時も、料理をシェアする時にも使える便利な一言"
+      },
+      {
+        fr: "Quelle heure est-il ?",
+        ja: "今何時ですか?",
+        kana: "ケル ウール エティル"
+      },
+      {
+        fr: "Vous ouvrez et vous fermez à quelle heure ?",
+        ja: "何時に開いて、何時に閉まりますか?",
+        kana: "ヴ ゾーヴレ エ ヴ フェルメ ア ケル ウール",
+        note: "vous ouvrez はリエゾンで「ヴ ゾーヴレ」と z の音が挟まる"
+      },
+      {
+        fr: "La réservation est à vingt heures.",
+        ja: "予約は20時です",
+        kana: "ラ レゼルヴァシオン エタ ヴァントゥール",
+        note: "フランスでは時刻を24時間表記で言うのが一般的。20時=vingt heures はリエゾンで「ヴァントゥール」"
+      },
+      {
+        fr: "Nous sommes deux.",
+        ja: "2名です",
+        kana: "ヌ ソム ドゥ"
+      },
+      {
+        fr: "Ça fait combien en tout ?",
+        ja: "全部でいくらですか?",
+        kana: "サ フェ コンビヤン アン トゥ"
+      },
+      {
+        fr: "Vous avez la monnaie ?",
+        ja: "小銭はありますか?",
+        kana: "ヴ ザヴェ ラ モネ",
+        note: "高額紙幣は少額の会計だと断られることがある。早めに小銭を崩しておくと安心"
+      }
+    ]
+  },
+  {
+    id: "smalltalk",
+    name: "会話をつなぐ一言",
+    icon: "💬",
+    description: "一言添えるだけで、会話がふっとほどける。相槌と質問の魔法",
+    phrases: [
+      {
+        fr: "C'est incroyable !",
+        ja: "すごい!",
+        kana: "セ タンクロワイヤブル",
+        note: "c'est incroyable はリエゾンで「セ タンクロワイヤブル」と t の音が挟まる"
+      },
+      {
+        fr: "Comme c'est joli !",
+        ja: "きれい!",
+        kana: "コム セ ジョリ"
+      },
+      {
+        fr: "Ça a l'air délicieux !",
+        ja: "おいしそう!",
+        kana: "サ ア ラール デリシュー",
+        note: "délicieux は男性形。女性名詞(tarte、soupe など)には délicieuse を使う"
+      },
+      {
+        fr: "Vraiment ?",
+        ja: "本当ですか?",
+        kana: "ヴレマン"
+      },
+      {
+        fr: "Bien sûr !",
+        ja: "もちろん!",
+        kana: "ビヤン シュール"
+      },
+      {
+        fr: "Un instant, s'il vous plaît.",
+        ja: "ちょっと待ってください",
+        kana: "アン ナンスタン シル ヴ プレ",
+        note: "un instant はリエゾンで「アン ナンスタン」と n の音が挟まる"
+      },
+      {
+        fr: "Pourriez-vous parler plus lentement ?",
+        ja: "もう少しゆっくりお願いします",
+        kana: "プーリエ ヴ パルレ プリュ ラントマン"
+      },
+      {
+        fr: "Pouvez-vous répéter, s'il vous plaît ?",
+        ja: "もう一度言ってください",
+        kana: "プヴェ ヴ レペテ シル ヴ プレ",
+        note: "Pardon ? だけでも通じるが、この一文の方が丁寧でゆっくり話してもらいやすい"
+      },
+      {
+        fr: "Je ne parle qu'un peu français.",
+        ja: "フランス語は少しだけ話せます",
+        kana: "ジュ ヌ パルル カン プ フランセ"
+      },
+      {
+        fr: "Je viens du Japon.",
+        ja: "日本から来ました",
+        kana: "ジュ ヴィヤン デュ ジャポン"
+      },
+      {
+        fr: "Qu'est-ce que vous me conseillez ?",
+        ja: "おすすめはどれですか?",
+        kana: "ケス ク ヴ ム コンセイエ",
+        note: "recommander(客観的なおすすめ)より conseiller の方が「あなたの個人的な意見」を尋ねるニュアンスで、会話が弾みやすい"
+      }
+    ]
+  },
+  {
+    id: "romance",
+    name: "ふたりの旅",
+    icon: "💐",
+    description: "ふたりだけの時間に。乾杯の言葉から、心に残るひとことまで",
+    phrases: [
+      {
+        fr: "Trinquons à nous !",
+        ja: "乾杯、私たちに",
+        kana: "トランコン ア ヌ",
+        note: "グラスを合わせる時は必ず相手の目を見るのがフランス流の乾杯マナー"
+      },
+      {
+        fr: "Pourriez-vous prendre une photo de nous deux ?",
+        ja: "ふたりの写真を撮ってもらえますか?",
+        kana: "プーリエ ヴ プランドル ユヌ フォト ドゥ ヌ ドゥ"
+      },
+      {
+        fr: "Je vous présente mon mari.",
+        ja: "夫を紹介します(妻の場合は ma femme)",
+        kana: "ジュ ヴ プレザント モン マリ",
+        note: "女性のパートナーを紹介する時は mon mari を ma femme に置き換えるだけでよい"
+      },
+      {
+        fr: "C'est notre anniversaire de mariage.",
+        ja: "結婚記念日なんです",
+        kana: "セ ノートル アニヴェルセール ドゥ マリアージュ",
+        note: "レストランで記念日だと伝えると、デザートに一工夫添えてくれる店もある。押し付けにならない程度にさりげなく伝えるのが吉"
+      },
+      {
+        fr: "Je suis heureux(se) d'être venu(e) ici avec toi.",
+        ja: "あなたと来られてよかった",
+        kana: "ジュ スイ ウルー デートル ヴニュ イシ アヴェック トワ"
+      },
+      {
+        fr: "Je t'aime.",
+        ja: "愛してる",
+        kana: "ジュ テーム",
+        note: "tu で話す相手専用の言葉。恋人・配偶者にはこちら、目上の人には使わない"
+      },
+      {
+        fr: "Cette table a-t-elle vue sur le coucher de soleil ?",
+        ja: "この席は夕日が見えますか?",
+        kana: "セット タブル ア テル ヴュ シュール ル クシェ ドゥ ソレイユ",
+        note: "avoir vue sur ~ で「~を見渡せる」という意味。窓際・テラス席を頼む時に添えたい一言"
+      },
+      {
+        fr: "On partage ce dessert tous les deux ?",
+        ja: "このデザートをふたりでシェアしましょうか?",
+        kana: "オン パルタージュ ス デセール トゥ レ ドゥ"
+      },
+      {
+        fr: "Tu es magnifique ce soir.",
+        ja: "今夜の君はとても素敵だよ",
+        kana: "テュ エ マニフィック ス ソワール"
+      },
+      {
+        fr: "Cette vue restera gravée dans nos souvenirs.",
+        ja: "この景色はふたりの思い出にずっと残るね",
+        kana: "セット ヴュ レストラ グラヴェ ダン ノ スヴニール"
+      },
+      {
+        fr: "À nous deux, pour toujours.",
+        ja: "ふたりでずっと、これからも",
+        kana: "ア ヌ ドゥ プール トゥジュール"
+      }
+    ]
   }
 ];
