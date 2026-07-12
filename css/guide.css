@@ -669,3 +669,75 @@
   .vmap-pin__disc { transition: none; }
   .stop.vmap-flash { animation: none; box-shadow: 0 0 0 3px var(--gold); }
 }
+
+/* =========================================================
+   現地マップ(Leaflet / OpenStreetMap)
+   ========================================================= */
+.rmap-wrap { margin: 14px 0 26px; }
+.rmap-el {
+  height: 340px; border-radius: var(--radius); border: 1px solid var(--line);
+  box-shadow: var(--shadow); overflow: hidden; background: var(--bg-2, #eee);
+  position: relative; z-index: 0; /* stickyナビより下に */
+}
+.rmap-note { margin: 10px 2px 0; font-size: .82rem; color: var(--ink-soft); line-height: 1.7; }
+.rmap-offline {
+  position: absolute; inset: auto 10px 10px 10px; z-index: 500;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 14px; font-size: .85rem; color: var(--ink);
+}
+
+/* 番号ピン */
+.rmap-pin-wrap { background: none; border: none; }
+.rmap-pin {
+  display: grid; place-items: center; width: 30px; height: 30px;
+  border-radius: 50%; background: var(--surface); color: var(--chap, var(--accent));
+  border: 2.5px solid var(--chap, var(--accent));
+  font-weight: 800; font-size: .92rem; font-family: var(--sans);
+  box-shadow: 0 3px 10px rgba(0,0,0,.3);
+}
+.rmap-pin.is-on { background: var(--gold); border-color: var(--gold); color: #fff; }
+.rmap-amenity {
+  display: grid; place-items: center; width: 22px; height: 22px; font-size: .95rem;
+  border-radius: 50%; background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 1px solid var(--line); box-shadow: 0 2px 6px rgba(0,0,0,.22);
+}
+.rmap-me {
+  display: block; width: 16px; height: 16px; border-radius: 50%;
+  background: #2f7cf6; border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(47,124,246,.4), 0 2px 8px rgba(0,0,0,.35);
+}
+
+/* ポップアップ */
+.rmap-pop { font-family: var(--sans); font-size: .9rem; display: grid; gap: 6px; min-width: 150px; }
+.rmap-pop strong { font-size: .95rem; }
+.rmap-pop em { color: #666; font-style: italic; font-family: var(--serif); }
+.rmap-pop__go {
+  border: 1px solid var(--gold); background: transparent; color: inherit;
+  border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: .85rem;
+}
+
+/* 現在地ボタン */
+.rmap-locate {
+  width: 34px; height: 34px; border-radius: 8px; border: 2px solid rgba(0,0,0,.2);
+  background: #fff; font-size: 1.05rem; line-height: 1; display: grid; place-items: center;
+}
+.rmap-locate.is-busy { animation: rmapPulse 1s infinite; }
+@keyframes rmapPulse { 50% { opacity: .4; } }
+
+/* カード発光(ピンから飛んだ時) */
+.rmap-flash { box-shadow: 0 0 0 3px var(--gold), var(--shadow-lift) !important; transition: box-shadow .4s; }
+
+/* ダークテーマ: タイルを夜モードに反転 */
+[data-theme="dark"] .rmap-el .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(200deg) brightness(.92) contrast(.9) saturate(.65);
+}
+[data-theme="dark"] .rmap-el { background: #10131f; }
+[data-theme="dark"] .rmap-locate { background: #191d2e; color: #eef0f8; border-color: rgba(255,255,255,.25); }
+[data-theme="dark"] .leaflet-popup-content-wrapper, [data-theme="dark"] .leaflet-popup-tip {
+  background: #191d2e; color: #eef0f8;
+}
+[data-theme="dark"] .rmap-pop em { color: #a3a9c4; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rmap-locate.is-busy { animation: none; }
+}

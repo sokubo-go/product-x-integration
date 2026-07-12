@@ -313,16 +313,16 @@
     // 章見出し + 折りたたみマップ
     var head = document.createElement('h3');
     head.className = 'spot__subhead';
-    head.textContent = '🗺️ 全体マップ';
+    head.textContent = '🗺️ イラストマップ(オフライン用)';
 
     var details = document.createElement('details');
     details.className = 'vmap-wrap';
-    details.open = true;
+    details.open = false;
     var summary = document.createElement('summary');
     summary.className = 'vmap-summary';
     summary.innerHTML =
       '<span class="vmap-summary__ic" aria-hidden="true">🗺️</span>' +
-      '<span class="vmap-summary__label">全体マップ</span>' +
+      '<span class="vmap-summary__label">イラストマップを開く(オフラインでも見られます)</span>' +
       '<span class="vmap-summary__hint" aria-hidden="true">開く / 閉じる</span>';
     details.appendChild(summary);
 
