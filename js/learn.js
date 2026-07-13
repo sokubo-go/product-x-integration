@@ -66,11 +66,14 @@
     var lang = conf.lang || 'fr-FR';
     var prefix = conf.storagePrefix || 'voyage.fr';
     var dialogues = Array.isArray(conf.dialogues) ? conf.dialogues : [];
+    var grammar = Array.isArray(conf.grammar) ? conf.grammar : [];
+    var vocab = Array.isArray(conf.vocab) ? conf.vocab : [];
 
     var K_SRS = prefix + '.srs';
     var K_NEW = prefix + '.newcount';
     var K_STREAK = prefix + '.streak';
     var K_SCENES = prefix + '.scenes';
+    var K_GRAMMAR = prefix + '.grammar';
 
     // フレーズをフラット化(key = catId::fr)
     var cats = Array.isArray(conf.phrasesData) ? conf.phrasesData : [];
@@ -93,6 +96,34 @@
     });
     var CARD_BY_KEY = {};
     CARDS.forEach(function (c) { CARD_BY_KEY[c.key] = c; });
+
+    // 単語帳(vocab)をカード化。SRS キーは vocab::カテゴリid::単語
+    var VOCAB_CATS = [];
+    var VOCAB_CARDS = [];
+    var VOCAB_CARD_BY_KEY = {};
+    vocab.forEach(function (cat) {
+      if (!cat || !Array.isArray(cat.words)) return;
+      var meta = { id: cat.id || 'v', name: cat.name || '', icon: cat.icon || '📒', words: [] };
+      cat.words.forEach(function (w) {
+        var x = w && w.x;
+        if (!x || !w.ja) return;
+        var key = 'vocab::' + meta.id + '::' + x;
+        var card = { key: key, catId: meta.id, catName: meta.name, catIcon: meta.icon,
+                     fr: x, ja: w.ja, kana: w.kana || '', note: w.note || '', isVocab: true };
+        VOCAB_CARDS.push(card);
+        VOCAB_CARD_BY_KEY[key] = card;
+        meta.words.push({ x: x, ja: w.ja, kana: w.kana || '', note: w.note || '', key: key });
+      });
+      if (meta.words.length) VOCAB_CATS.push(meta);
+    });
+
+    // 4択の誤答プール = フレーズ + 語彙
+    var DISTRACTOR_POOL = CARDS.concat(VOCAB_CARDS);
+
+    // srs キーからカードを解決(phrase / vocab)。孤児は null
+    function cardForKey(key) {
+      return CARD_BY_KEY[key] || VOCAB_CARD_BY_KEY[key] || null;
+    }
 
     // 音声再生ボタン生成(speak 経由・rate 指定でスロー)
     function speakBtn(text, label, rate, extraClass) {
@@ -146,13 +177,47 @@
       if (done.indexOf(id) === -1) { done.push(id); writeJSON(K_SCENES, done); }
     }
 
+    // 文法コースの修了状態
+    function loadGrammarDone() {
+      var v = readJSON(K_GRAMMAR, {});
+      return (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+    }
+    function markGrammarDone(id) {
+      var d = loadGrammarDone(); d[id] = true; writeJSON(K_GRAMMAR, d);
+    }
+    function grammarSorted() {
+      return grammar.slice().sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+    }
+
+    // 単語帳の SRS 操作(キー = vocab::カテゴリid::単語)
+    function addVocabWord(word) {
+      var srs = loadSrs();
+      if (!srs[word.key]) { srs[word.key] = { box: 1, due: todayNum(), seen: 0, ok: 0 }; saveSrs(srs); }
+    }
+    function removeVocabWord(word) {
+      var srs = loadSrs();
+      if (srs[word.key]) { delete srs[word.key]; saveSrs(srs); }
+    }
+    function vocabAddedCount(meta) {
+      var srs = loadSrs(), n = 0;
+      meta.words.forEach(function (w) { if (srs[w.key]) n++; });
+      return n;
+    }
+
     // 期限到来・新規の集計
     function dueCards() {
-      var srs = loadSrs(), t = todayNum(), out = [];
-      CARDS.forEach(function (c) {
-        var r = srs[c.key];
+      var srs = loadSrs(), t = todayNum(), out = [], changed = false;
+      Object.keys(srs).forEach(function (key) {
+        var c = cardForKey(key);
+        if (!c) {
+          // conf.vocab に見つからない孤児 vocab キーは掃除
+          if (key.indexOf('vocab::') === 0) { delete srs[key]; changed = true; }
+          return;
+        }
+        var r = srs[key];
         if (r && (r.due == null || r.due <= t)) out.push(c);
       });
+      if (changed) saveSrs(srs);
       return out;
     }
     function newAvailable() {
@@ -204,7 +269,7 @@
 
     // 4択の誤答を他フレーズの和訳から
     function distractors(correctJa, n) {
-      var pool = shuffle(CARDS).filter(function (c) { return c.ja && c.ja !== correctJa; });
+      var pool = shuffle(DISTRACTOR_POOL).filter(function (c) { return c.ja && c.ja !== correctJa; });
       var seen = {}, out = [];
       seen[correctJa] = true;
       for (var i = 0; i < pool.length && out.length < n; i++) {
@@ -220,7 +285,7 @@
       container.className = 'learn-root';
       container.innerHTML = '';
 
-      if (!CARDS.length && !dialogues.length) {
+      if (!CARDS.length && !dialogues.length && !grammar.length && !VOCAB_CATS.length) {
         container.innerHTML = '<div class="learn-card learn-empty">' +
           '<div class="learn-empty__icon">📚</div>' +
           '<p>レッスン用のフレーズを準備中です。</p></div>';
@@ -257,6 +322,31 @@
       }
       html += '</div>';
 
+      // 📖 基礎文法コース(ユニット一覧 + 修了✓ + 進捗 n/12)
+      if (grammar.length) {
+        var gdone = loadGrammarDone();
+        var gsorted = grammarSorted();
+        var doneN = gsorted.filter(function (u) { return gdone[u.id]; }).length;
+        var firstUndoneSeen = false;
+        html += '<div class="learn-section">' +
+          '<div class="learn-h3-row"><h3 class="learn-h3">📖 基礎文法コース</h3>' +
+          '<span class="learn-count">' + doneN + '/' + grammar.length + '</span></div>' +
+          '<div class="learn-unit-list">';
+        gsorted.forEach(function (u, i) {
+          var isDone = !!gdone[u.id];
+          var isFirst = !isDone && !firstUndoneSeen;
+          if (isFirst) firstUndoneSeen = true;
+          html += '<button type="button" class="learn-unit-card' + (isDone ? ' is-done' : '') + '" data-unit="' + i + '">' +
+            '<span class="learn-unit-card__icon" aria-hidden="true">' + esc(u.icon || '📖') + '</span>' +
+            '<span class="learn-unit-card__body">' +
+              '<span class="learn-unit-card__title">' + esc(u.title || '') +
+                (isDone ? ' <span class="learn-check" aria-label="修了">✓</span>' : '') + '</span>' +
+              (isFirst ? '<span class="learn-badge">まずはここから</span>' : '') +
+            '</span></button>';
+        });
+        html += '</div></div>';
+      }
+
       // シーン会話ドリル一覧
       if (dialogues.length) {
         var done = loadScenes();
@@ -271,6 +361,22 @@
                 (isDone ? ' <span class="learn-check" aria-label="完了">✓</span>' : '') + '</span>' +
               '<span class="learn-scene-card__desc">' + esc(d.desc || '') + '</span>' +
             '</span></button>';
+        });
+        html += '</div></div>';
+      }
+
+      // 📒 単語帳(カテゴリカード + 追加済みn)
+      if (VOCAB_CATS.length) {
+        html += '<div class="learn-section"><h3 class="learn-h3">📒 単語帳</h3>' +
+          '<div class="learn-vocab-cats">';
+        VOCAB_CATS.forEach(function (meta, i) {
+          var added = vocabAddedCount(meta);
+          html += '<button type="button" class="learn-vocab-cat" data-vcat="' + i + '">' +
+            '<span class="learn-vocab-cat__icon" aria-hidden="true">' + esc(meta.icon) + '</span>' +
+            '<span class="learn-vocab-cat__name">' + esc(meta.name) + '</span>' +
+            '<span class="learn-vocab-cat__meta">' + meta.words.length + '語' +
+              (added ? ' · <em>' + added + '追加済み</em>' : '') + '</span>' +
+          '</button>';
         });
         html += '</div></div>';
       }
@@ -298,6 +404,16 @@
       Array.prototype.forEach.call(container.querySelectorAll('[data-scene]'), function (el) {
         el.addEventListener('click', function () {
           openScene(dialogues[parseInt(el.getAttribute('data-scene'), 10)]);
+        });
+      });
+      Array.prototype.forEach.call(container.querySelectorAll('[data-unit]'), function (el) {
+        el.addEventListener('click', function () {
+          openGrammarUnit(grammarSorted()[parseInt(el.getAttribute('data-unit'), 10)]);
+        });
+      });
+      Array.prototype.forEach.call(container.querySelectorAll('[data-vcat]'), function (el) {
+        el.addEventListener('click', function () {
+          openVocabList(VOCAB_CATS[parseInt(el.getAttribute('data-vcat'), 10)]);
         });
       });
     }
@@ -637,6 +753,303 @@
         delay += dur; last = delay;
       });
       if (btn) setTimeout(function () { btn.disabled = false; btn.classList.remove('is-playing'); }, last);
+    }
+
+    // =========================================================
+    // 基礎文法コース(ユニットプレーヤー)
+    // =========================================================
+    var gunit = null;
+
+    function openGrammarUnit(unit) {
+      if (!unit) { renderHome(); return; }
+      gunit = { unit: unit, drills: Array.isArray(unit.drills) ? unit.drills.slice() : [], i: 0 };
+      renderGrammarIntro();
+    }
+
+    // intro 段落 + points ルールカード(例文に🔊)→「練習する」
+    function renderGrammarIntro() {
+      var u = gunit.unit;
+      var points = Array.isArray(u.points) ? u.points : [];
+      var intro = (Array.isArray(u.intro) ? u.intro : (u.intro ? [u.intro] : []))
+        .map(function (p) { return '<p class="learn-g-intro__p">' + esc(p) + '</p>'; }).join('');
+
+      var html = '<div class="learn-topbar">' +
+          '<button type="button" class="learn-back" aria-label="コース一覧に戻る">‹ コース一覧</button></div>' +
+        '<div class="learn-card learn-g-head">' +
+          '<div class="learn-g-head__icon" aria-hidden="true">' + esc(u.icon || '📖') + '</div>' +
+          '<h2 class="learn-g-title">' + esc(u.title || '') + '</h2>' +
+          (intro ? '<div class="learn-g-intro">' + intro + '</div>' : '') +
+        '</div>';
+
+      points.forEach(function (pt) {
+        html += '<div class="learn-card learn-rule">' +
+          '<h3 class="learn-rule__h">' + esc(pt.rule || '') + '</h3>' +
+          '<div class="learn-rule__examples">';
+        (Array.isArray(pt.examples) ? pt.examples : []).forEach(function (ex) {
+          html += '<div class="learn-rule__ex">' +
+            '<div class="learn-rule__ex-text">' +
+              '<span class="learn-rule__x">' + esc(ex.x || '') + '</span>' +
+              (ex.kana ? '<span class="learn-rule__kana">' + esc(ex.kana) + '</span>' : '') +
+              (ex.ja ? '<span class="learn-rule__ja">' + esc(ex.ja) + '</span>' : '') +
+            '</div>' +
+            '<span class="learn-rule__audio"></span>' +
+          '</div>';
+        });
+        html += '</div></div>';
+      });
+
+      html += '<button type="button" class="learn-btn learn-btn-primary learn-g-start">' +
+        (gunit.drills.length ? '練習する →' : '修了にする 🎉') + '</button>';
+
+      container.className = 'learn-root';
+      container.innerHTML = html;
+      container.querySelector('.learn-back').addEventListener('click', renderHome);
+
+      // 例文の音声ボタンを挿入(点→行の順で対応)
+      var ruleEls = container.querySelectorAll('.learn-rule');
+      Array.prototype.forEach.call(ruleEls, function (ruleEl, pi) {
+        var exs = Array.isArray(points[pi].examples) ? points[pi].examples : [];
+        Array.prototype.forEach.call(ruleEl.querySelectorAll('.learn-rule__audio'), function (slot, ei) {
+          if (exs[ei] && exs[ei].x) slot.appendChild(speakBtn(exs[ei].x, '🔊', null, ''));
+        });
+      });
+
+      container.querySelector('.learn-g-start').addEventListener('click', function () {
+        if (gunit.drills.length) { gunit.i = 0; renderGrammarDrill(); }
+        else finishGrammar();
+      });
+    }
+
+    function grammarBar() {
+      var pct = gunit.drills.length ? Math.round((gunit.i / gunit.drills.length) * 100) : 0;
+      return '<div class="learn-progress"><div class="learn-progress__track">' +
+        '<div class="learn-progress__fill" style="width:' + pct + '%"></div></div>' +
+        '<button type="button" class="learn-quit" aria-label="コース一覧に戻る">✕</button></div>';
+    }
+
+    function renderGrammarDrill() {
+      if (!gunit || gunit.i >= gunit.drills.length) { finishGrammar(); return; }
+      var drill = gunit.drills[gunit.i];
+      if (drill && drill.type === 'order') renderOrderDrill(drill);
+      else renderChoiceDrill(drill);
+    }
+
+    // choice / fill: 選択肢ボタン。正解=緑+一言 / 不正解=explain 表示 → 選択肢シャッフルで再挑戦
+    function renderChoiceDrill(drill) {
+      var choices = Array.isArray(drill.choices) ? drill.choices : [];
+      var correctVal = choices[drill.answer];
+      var opts = shuffle(choices);
+
+      container.className = 'learn-root';
+      container.innerHTML = grammarBar() +
+        '<div class="learn-card learn-play learn-drill">' +
+          '<p class="learn-kicker">' + (drill.type === 'fill' ? '✏️ 空欄をうめる' : '❓ 正しいものを選ぶ') + '</p>' +
+          '<p class="learn-drill__q">' + esc(drill.q || '') + '</p>' +
+          '<div class="learn-options"></div>' +
+          '<div class="learn-feedback" hidden></div>' +
+        '</div>';
+      container.querySelector('.learn-quit').addEventListener('click', renderHome);
+
+      var wrap = container.querySelector('.learn-options');
+      var fb = container.querySelector('.learn-feedback');
+      var answered = false;
+
+      opts.forEach(function (opt) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'learn-option'; b.textContent = opt;
+        b.addEventListener('click', function () {
+          if (answered) return;
+          var ok = opt === correctVal;
+          if (ok) {
+            answered = true;
+            Array.prototype.forEach.call(wrap.children, function (btn) {
+              btn.disabled = true;
+              if (btn === b) btn.classList.add('is-correct');
+            });
+            fb.hidden = false; fb.className = 'learn-feedback is-correct';
+            fb.innerHTML = '<p class="learn-feedback__h">' + praiseOne(lang) + ' 🎉</p>' +
+              (drill.explain ? '<p class="learn-feedback__ja">' + esc(drill.explain) + '</p>' : '') +
+              '<button type="button" class="learn-btn learn-btn-primary learn-next">次へ</button>';
+            fb.querySelector('.learn-next').addEventListener('click', function () {
+              gunit.i++; renderGrammarDrill();
+            });
+            fb.scrollIntoView({ block: 'nearest' });
+          } else {
+            b.classList.add('is-wrong'); b.disabled = true;
+            fb.hidden = false; fb.className = 'learn-feedback is-wrong';
+            fb.innerHTML = '<p class="learn-feedback__h">おしい!</p>' +
+              (drill.explain ? '<p class="learn-feedback__ja">' + esc(drill.explain) + '</p>' : '') +
+              '<button type="button" class="learn-btn learn-retry">もう一度</button>';
+            fb.querySelector('.learn-retry').addEventListener('click', function () {
+              renderChoiceDrill(drill); // 選択肢シャッフルで再挑戦
+            });
+            fb.scrollIntoView({ block: 'nearest' });
+          }
+        });
+        wrap.appendChild(b);
+      });
+    }
+
+    // order: tokens をシャッフルしてチップ表示。タップで組み立て/取り消し。答え合わせで比較
+    function renderOrderDrill(drill) {
+      var tokens = (Array.isArray(drill.tokens) ? drill.tokens : []).map(function (t, i) {
+        return { id: i, val: t };
+      });
+      var bank = shuffle(tokens);
+      var built = [];
+      var solved = false;
+
+      container.className = 'learn-root';
+      container.innerHTML = grammarBar() +
+        '<div class="learn-card learn-play learn-drill">' +
+          '<p class="learn-kicker">🧩 語を並べて文を作る</p>' +
+          '<p class="learn-drill__q">' + esc(drill.q || '') + '</p>' +
+          '<div class="learn-build" aria-label="組み立てエリア"></div>' +
+          '<div class="learn-bank"></div>' +
+          '<div class="learn-drill__actions">' +
+            '<button type="button" class="learn-btn learn-btn-primary learn-check" disabled>答え合わせ</button>' +
+          '</div>' +
+          '<div class="learn-feedback" hidden></div>' +
+        '</div>';
+      container.querySelector('.learn-quit').addEventListener('click', renderHome);
+
+      var buildEl = container.querySelector('.learn-build');
+      var bankEl = container.querySelector('.learn-bank');
+      var checkBtn = container.querySelector('.learn-check');
+      var fb = container.querySelector('.learn-feedback');
+
+      function chip(tok, built1) {
+        var c = document.createElement('button');
+        c.type = 'button';
+        c.className = 'learn-chip' + (built1 ? ' is-built' : '');
+        c.textContent = tok.val;
+        c.addEventListener('click', function () {
+          if (solved) return;
+          if (built1) { built = built.filter(function (x) { return x !== tok; }); bank.push(tok); }
+          else { bank = bank.filter(function (x) { return x !== tok; }); built.push(tok); }
+          draw();
+        });
+        return c;
+      }
+      function draw() {
+        buildEl.innerHTML = ''; bankEl.innerHTML = '';
+        built.forEach(function (tok) { buildEl.appendChild(chip(tok, true)); });
+        if (!built.length) {
+          var ph = document.createElement('span');
+          ph.className = 'learn-build__ph'; ph.textContent = 'ここに語を並べます';
+          buildEl.appendChild(ph);
+        }
+        bank.forEach(function (tok) { bankEl.appendChild(chip(tok, false)); });
+        checkBtn.disabled = built.length === 0;
+      }
+      draw();
+
+      checkBtn.addEventListener('click', function () {
+        if (solved) return;
+        var attempt = built.map(function (t) { return t.val; }).join(' ');
+        if (attempt === drill.answer) {
+          solved = true;
+          Array.prototype.forEach.call(buildEl.querySelectorAll('.learn-chip'), function (c) { c.disabled = true; });
+          checkBtn.disabled = true;
+          fb.hidden = false; fb.className = 'learn-feedback is-correct';
+          fb.innerHTML = '<p class="learn-feedback__h">' + praiseOne(lang) + ' 🎉</p>' +
+            '<p class="learn-feedback__fr">' + esc(drill.answer) + '</p>' +
+            (drill.explain ? '<p class="learn-feedback__ja">' + esc(drill.explain) + '</p>' : '') +
+            '<button type="button" class="learn-btn learn-btn-primary learn-next">次へ</button>';
+          fb.querySelector('.learn-next').addEventListener('click', function () {
+            gunit.i++; renderGrammarDrill();
+          });
+          fb.scrollIntoView({ block: 'nearest' });
+        } else {
+          fb.hidden = false; fb.className = 'learn-feedback is-wrong';
+          fb.innerHTML = '<p class="learn-feedback__h">おしい!並べ替えてみよう</p>' +
+            (drill.explain ? '<p class="learn-feedback__ja">' + esc(drill.explain) + '</p>' : '');
+          fb.scrollIntoView({ block: 'nearest' });
+        }
+      });
+    }
+
+    // 全問クリア → 修了(grammar 保存 + ストリーク)
+    function finishGrammar() {
+      var u = gunit.unit;
+      markGrammarDone(u.id);
+      var streak = bumpStreak();
+      container.className = 'learn-root';
+      container.innerHTML =
+        '<div class="learn-card learn-result">' +
+          '<div class="learn-result__icon">🎉</div>' +
+          '<p class="learn-result__praise">' + esc(praiseOne(lang)) + '</p>' +
+          '<p class="learn-result__sub">「' + esc(u.title || '') + '」を修了しました。</p>' +
+          '<div class="learn-scene-actions">' +
+            '<button type="button" class="learn-btn learn-btn-primary learn-home">コース一覧へ戻る</button>' +
+          '</div>' +
+          '<p class="learn-note">🔥 連続 ' + streak.count + '日</p>' +
+        '</div>';
+      container.querySelector('.learn-home').addEventListener('click', renderHome);
+      gunit = null;
+    }
+
+    // =========================================================
+    // 単語帳(カテゴリ一覧)
+    // =========================================================
+    function openVocabList(meta) {
+      if (!meta) { renderHome(); return; }
+      renderVocabList(meta);
+    }
+
+    function renderVocabList(meta) {
+      var srs = loadSrs();
+
+      container.className = 'learn-root';
+      container.innerHTML = '<div class="learn-topbar">' +
+          '<button type="button" class="learn-back" aria-label="単語帳に戻る">‹ 単語帳</button></div>' +
+        '<div class="learn-card learn-vocab-head">' +
+          '<div class="learn-vocab-head__title">' +
+            '<span aria-hidden="true">' + esc(meta.icon) + '</span> ' + esc(meta.name) +
+            ' <span class="learn-count">' + meta.words.length + '語</span>' +
+          '</div>' +
+          '<button type="button" class="learn-btn learn-vocab-all">＋ このカテゴリを全部追加</button>' +
+        '</div>' +
+        '<div class="learn-card learn-vocab-list"></div>';
+      container.querySelector('.learn-back').addEventListener('click', renderHome);
+
+      var listEl = container.querySelector('.learn-vocab-list');
+
+      function paintBtn(btn, added) {
+        btn.classList.toggle('is-added', added);
+        btn.textContent = added ? '✓' : '＋';
+        btn.setAttribute('aria-label', added ? '追加済み(タップで削除)' : 'SRSに追加');
+        btn.setAttribute('aria-pressed', String(added));
+      }
+
+      meta.words.forEach(function (word) {
+        var row = document.createElement('div');
+        row.className = 'learn-vword';
+        row.innerHTML =
+          '<div class="learn-vword__text">' +
+            '<span class="learn-vword__x">' + esc(word.x) + '</span>' +
+            (word.kana ? '<span class="learn-vword__kana">' + esc(word.kana) + '</span>' : '') +
+            '<span class="learn-vword__ja">' + esc(word.ja) + '</span>' +
+          '</div>' +
+          '<div class="learn-vword__actions"></div>';
+        var actions = row.querySelector('.learn-vword__actions');
+        actions.appendChild(speakBtn(word.x, '🔊', null, ''));
+        var add = document.createElement('button');
+        add.type = 'button'; add.className = 'learn-vadd';
+        paintBtn(add, !!loadSrs()[word.key]);
+        add.addEventListener('click', function () {
+          var nowAdded = !loadSrs()[word.key];
+          if (nowAdded) addVocabWord(word); else removeVocabWord(word);
+          paintBtn(add, nowAdded);
+        });
+        actions.appendChild(add);
+        listEl.appendChild(row);
+      });
+
+      container.querySelector('.learn-vocab-all').addEventListener('click', function () {
+        meta.words.forEach(function (word) { addVocabWord(word); });
+        renderVocabList(meta); // 再描画で全て✓に
+      });
     }
 
     // 起動
