@@ -72,11 +72,11 @@
       </a>
 
       <nav class="tabs" role="tablist" aria-label="メインナビゲーション">
-        <button class="tabs__btn is-active" role="tab" data-nav="home" aria-selected="true"><span class="tabs__icon" aria-hidden="true">🌅</span><span class="tabs__label">ホーム</span></button>
-        <button class="tabs__btn" role="tab" data-nav="phrases" aria-selected="false"><span class="tabs__icon" aria-hidden="true">💬</span><span class="tabs__label">フレーズ集</span></button>
-        <button class="tabs__btn" role="tab" data-nav="learn" aria-selected="false"><span class="tabs__icon" aria-hidden="true">📚</span><span class="tabs__label">レッスン</span></button>
-        <button class="tabs__btn" role="tab" data-nav="culture" aria-selected="false"><span class="tabs__icon" aria-hidden="true">📖</span><span class="tabs__label">文化ガイド</span></button>
-        <button class="tabs__btn" role="tab" data-nav="quiz" aria-selected="false"><span class="tabs__icon" aria-hidden="true">🎯</span><span class="tabs__label">クイズ</span></button>
+        <button class="tabs__btn is-active" role="tab" data-nav="home" aria-selected="true"><span class="tabs__icon" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7.25"/><path d="M13 7 10.6 10.6 7 13 9.4 9.4 13 7Z"/></svg></span><span class="tabs__label">ホーム</span></button>
+        <button class="tabs__btn" role="tab" data-nav="phrases" aria-selected="false"><span class="tabs__icon" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 4h9A1.5 1.5 0 0 1 16 5.5v6A1.5 1.5 0 0 1 14.5 13H9l-3.6 3 .35-3H5.5A1.5 1.5 0 0 1 4 11.5v-6A1.5 1.5 0 0 1 5.5 4Z"/></svg></span><span class="tabs__label">フレーズ集</span></button>
+        <button class="tabs__btn" role="tab" data-nav="learn" aria-selected="false"><span class="tabs__icon" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5.4C8.4 4.4 6.4 4.1 4.3 4.4v9.2c2.1-.3 4.1 0 5.7 1 1.6-1 3.6-1.3 5.7-1V4.4c-2.1-.3-4.1 0-5.7 1Z"/><path d="M10 5.4v9.2"/></svg></span><span class="tabs__label">レッスン</span></button>
+        <button class="tabs__btn" role="tab" data-nav="culture" aria-selected="false"><span class="tabs__icon" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 7.2 10 3.6l6.8 3.6"/><path d="M4.8 8v5.4M8 8v5.4M12 8v5.4M15.2 8v5.4"/><path d="M3.6 8h12.8M3 13.6h14"/></svg></span><span class="tabs__label">文化ガイド</span></button>
+        <button class="tabs__btn" role="tab" data-nav="quiz" aria-selected="false"><span class="tabs__icon" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3.4"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/></svg></span><span class="tabs__label">クイズ</span></button>
       </nav>
 
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="テーマ切替" title="ライト / ダーク切替">
@@ -153,19 +153,21 @@
           </svg>
         </div>
         <div class="hero__content">
-          <p class="hero__eyebrow">Buongiorno, viaggiatore.</p>
+          <p class="hero__eyebrow">Buongiorno, viaggiatore</p>
           <h1 class="hero__title"><span>イタリアの朝が、</span><br><span>あなたを待っている。</span></h1>
           <p class="hero__lead">「勉強」ではなく「旅の予感」。カプチーノの湯気、石畳を照らす朝陽、広場に響く Buongiorno。声に出せば、その一言が旅先で本当に使える魔法になる。さあ、旅するイタリア語を始めましょう。</p>
           <div class="hero__actions">
-            <button class="btn btn-primary" data-nav="phrases" type="button">💬 フレーズを見る</button>
-            <button class="btn" data-nav="learn" type="button">📚 今日のレッスン</button>
+            <button class="btn btn-primary" data-nav="phrases" type="button">フレーズを見る</button>
+            <button class="btn" data-nav="learn" type="button">今日のレッスン</button>
           </div>
+          <p class="hero__route" aria-hidden="true">Roma — Firenze — Santorini</p>
         </div>
       </div>
 
       <!-- 今日のフレーズ -->
       <div class="section">
         <div class="section__head">
+          <p class="kicker">Frase del giorno</p>
           <h2 class="section__title">今日のフレーズ</h2>
           <p class="section__desc">毎日ひとつ、旅の一言を。</p>
         </div>
@@ -175,6 +177,7 @@
       <!-- イタリアの風景(写真ギャラリー) -->
       <div class="section gallery-section" id="gallerySection" hidden>
         <div class="section__head">
+          <p class="kicker">Paesaggi</p>
           <h2 class="section__title">イタリアの風景</h2>
           <p class="section__desc">タップして、旅の情景に一歩近づく。</p>
         </div>
@@ -184,6 +187,7 @@
       <!-- 導線カード -->
       <div class="section">
         <div class="section__head">
+          <p class="kicker">Imbarco</p>
           <h2 class="section__title">旅の準備をはじめる</h2>
         </div>
         <div class="nav-cards">
@@ -230,6 +234,7 @@
     <!-- フレーズ集 -->
     <section id="view-phrases" class="view" role="tabpanel" aria-label="フレーズ集" tabindex="-1" hidden>
       <div class="view__head">
+        <p class="kicker">Repertorio</p>
         <h1 class="view__title">フレーズ集</h1>
         <p class="view__lead">場面を選んで、旅先で使える一言を。☆でお気に入りに保存できます。</p>
       </div>
@@ -240,6 +245,7 @@
     <!-- レッスン -->
     <section id="view-learn" class="view" role="tabpanel" aria-label="レッスン" tabindex="-1" hidden>
       <div class="view__head">
+        <p class="kicker">Lezione del giorno</p>
         <h1 class="view__title">レッスン</h1>
         <p class="view__lead">今日のレッスンは約5分。間隔をあけて思い出し、声に出して、体にしみこませよう。</p>
       </div>
@@ -249,6 +255,7 @@
     <!-- 文化ガイド -->
     <section id="view-culture" class="view" role="tabpanel" aria-label="文化ガイド" tabindex="-1" hidden>
       <div class="view__head">
+        <p class="kicker">Arte di vivere</p>
         <h1 class="view__title">文化ガイド</h1>
         <p class="view__lead">知っておくと旅が変わる、イタリアの作法と暮らしの知恵。</p>
       </div>
@@ -259,6 +266,7 @@
     <!-- クイズ -->
     <section id="view-quiz" class="view" role="tabpanel" aria-label="クイズ" tabindex="-1" hidden>
       <div class="view__head">
+        <p class="kicker">Ripasso</p>
         <h1 class="view__title">クイズ</h1>
         <p class="view__lead">全10問。意味当てとリスニングで、フレーズの記憶を確かめよう。</p>
       </div>
