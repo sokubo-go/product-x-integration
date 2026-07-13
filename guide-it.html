@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Voyage 観光ガイド イタリア編 — ローマとサントリーニを歩く、片手の相棒。順路・見どころ・物語・使えるイタリア語 / ギリシャ語の一言。">
+  <meta name="color-scheme" content="light dark">
+  <title>ローマ&amp;サントリーニ ガイド — Voyage</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🇮🇹%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="css/guide.css">
+  <!-- テーマのちらつき防止: 描画前に保存済みテーマを適用(index.html と同一) -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('voyage.theme');
+        if (!t) {
+          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <!-- イタリア編のカバー配色: 夕暮れのテラコッタとエーゲ海の青が出会う空。
+       guide.css は編集せず、このページ内でカバーの空だけを上書きする。 -->
+  <style>
+    .cover {
+      background:
+        linear-gradient(180deg,
+          #0e3a5e 0%,
+          #1d5a7d 22%,
+          #3f7f92 42%,
+          #8a6a68 60%,
+          #c56f4a 80%,
+          #f0bd74 100%);
+    }
+    [data-theme="dark"] .cover {
+      background:
+        linear-gradient(180deg,
+          #04121f 0%,
+          #0a2a41 28%,
+          #16495f 50%,
+          #4a3f45 72%,
+          #7c4530 90%,
+          #96562a 100%);
+    }
+    /* コロッセオのシルエットは白に近いテラコッタで浮かせる(石灰岩の色) */
+    .cover__arc { color: #24160e; opacity: .9; width: min(400px, 82%); }
+    [data-theme="dark"] .cover__arc { color: #050608; }
+    /* 相互リンク(パリ編)は アプリへ の隣に小さく並べる */
+    .guide-back--alt { margin-left: auto; padding: 0 13px; font-size: .9rem; }
+    .guide-back--alt + .guide-back { margin-left: 8px; }
+  </style>
+</head>
+<body class="guide">
+  <a class="skip-link" href="#main">本文へスキップ</a>
+
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <div class="app-header__inner">
+      <a class="brand" href="index.html" aria-label="Voyage アプリへ">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 40" width="18" height="30" fill="currentColor" role="img">
+            <path d="M12 0c.5 3.4 1.3 5.6 2.4 7.2h-1.5l.4 3.1h-.9l1.6 9.4h1.2v2H14l2.4 16.9h-2.6l-.7-6.6c-.1-.7-.5-1-.9-1h-.4c-.4 0-.8.3-.9 1l-.7 6.6H7.6L10 21.7H8.8v-2H10l1.6-9.4h-.9l.4-3.1H9.6C10.7 5.6 11.5 3.4 12 0zm-1.1 24.3l-1 7.1h4.2l-1-7.1c-.1-.5-.4-.8-.8-.8h-.6c-.4 0-.7.3-.8.8z"/>
+          </svg>
+        </span>
+        <span class="brand__text">
+          <span class="brand__name">Voyage</span>
+          <span class="brand__sub">イタリア編</span>
+        </span>
+      </a>
+
+      <a class="guide-back guide-back--alt" href="guide.html" title="パリ編ガイドへ">
+        <span aria-hidden="true">🇫🇷</span><span class="guide-back__label">パリ編</span>
+      </a>
+
+      <a class="guide-back" href="index.html">
+        <span aria-hidden="true">←</span><span class="guide-back__label">アプリへ</span>
+      </a>
+
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="テーマ切替" title="ライト / ダーク切替">
+        <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">☀️</span>
+        <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- スティッキー: スポットジャンプ + 進捗 -->
+  <nav class="spotnav" id="spotNav" aria-label="スポットへジャンプ" hidden>
+    <div class="spotnav__inner" id="spotNavInner"></div>
+  </nav>
+
+  <main id="main" class="guide-main" tabindex="-1">
+
+    <!-- カバー(普遍的ヒーロー / 夕暮れのコロッセオとエーゲ海) -->
+    <section class="cover" aria-label="ローマ&amp;サントリーニ 観光ガイド">
+      <div class="cover__sky" aria-hidden="true">
+        <span class="cover__sun"></span>
+        <svg class="cover__arc" viewBox="0 0 200 150" preserveAspectRatio="xMidYMax meet" role="img" aria-label="コロッセオのシルエット">
+          <path fill-rule="evenodd" d="M14 150 L14 60 Q14 48 26 46 Q100 33 174 46 Q186 48 186 60 L186 150 Z M21 150 L21 110 Q21 97 30 97 Q39 97 39 110 L39 150 Z M43 150 L43 110 Q43 97 52 97 Q61 97 61 110 L61 150 Z M65 150 L65 110 Q65 97 74 97 Q83 97 83 110 L83 150 Z M87 150 L87 110 Q87 97 96 97 Q105 97 105 110 L105 150 Z M109 150 L109 110 Q109 97 118 97 Q127 97 127 110 L127 150 Z M131 150 L131 110 Q131 97 140 97 Q149 97 149 110 L149 150 Z M153 150 L153 110 Q153 97 162 97 Q171 97 171 110 L171 150 Z M24 90 L24 74 Q24 64 30 64 Q36 64 36 74 L36 90 Z M46 90 L46 74 Q46 64 52 64 Q58 64 58 74 L58 90 Z M68 90 L68 74 Q68 64 74 64 Q80 64 80 74 L80 90 Z M90 90 L90 74 Q90 64 96 64 Q102 64 102 74 L102 90 Z M112 90 L112 74 Q112 64 118 64 Q124 64 124 74 L124 90 Z M134 90 L134 74 Q134 64 140 64 Q146 64 146 74 L146 90 Z M156 90 L156 74 Q156 64 162 64 Q168 64 168 74 L168 90 Z"/>
+        </svg>
+      </div>
+      <div class="cover__content">
+        <p class="cover__eyebrow">Guida del giorno</p>
+        <h1 class="cover__title"><span>永遠の都から、</span><br><span>白と青の島へ。</span></h1>
+        <p class="cover__lead">ふたりの新婚旅行。ローマの石畳を二日かけて歩き、トレビの泉に願いを、コロッセオに二千年を、バチカンに祈りを。そしてエーゲ海へ——サントリーニの白い家と青いドーム、カルデラに沈む夕日まで。目の前のひとつひとつを、順路のとおりに。</p>
+        <div class="cover__hint" aria-hidden="true">
+          <span class="cover__hint-chev">⌄</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1日プラン(タイムライン) -->
+    <section class="section dayplan" id="dayPlan" aria-label="今日のプラン"></section>
+
+    <!-- スポット章(GUIDE_SPOTS を order 順に描画) -->
+    <div id="spots"></div>
+
+  </main>
+
+  <footer class="app-footer">
+    <p>Voyage — ローマ &amp; サントリーニ · 良い一日を。<span class="app-footer__fr">Buona giornata !</span></p>
+  </footer>
+
+  <!-- 音声の既定言語をイタリア語に(guide.js より前に定義すること) -->
+  <script>window.GUIDE_LANG = 'it-IT';</script>
+
+  <!-- データ → ガイド本体 → 地図 の順(DESIGN.md イタリア編 準拠) -->
+  <script src="data/guide-it-roma.js"></script>
+  <script src="data/guide-it-vaticano.js"></script>
+  <script src="data/guide-it-santorini.js"></script>
+  <script src="js/guide.js"></script>
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="data/geo-it.js"></script>
+  <script src="js/real-map.js"></script>
+</body>
+</html>
