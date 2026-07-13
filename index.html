@@ -8,6 +8,7 @@
   <title>Voyage — 旅するフランス語</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🗼%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/learn.css">
   <!-- テーマのちらつき防止: 描画前に保存済みテーマを適用 -->
   <script>
     (function () {
@@ -43,6 +44,7 @@
       <nav class="tabs" role="tablist" aria-label="メインナビゲーション">
         <button class="tabs__btn is-active" role="tab" data-nav="home" aria-selected="true"><span class="tabs__icon" aria-hidden="true">🌅</span><span class="tabs__label">ホーム</span></button>
         <button class="tabs__btn" role="tab" data-nav="phrases" aria-selected="false"><span class="tabs__icon" aria-hidden="true">💬</span><span class="tabs__label">フレーズ集</span></button>
+        <button class="tabs__btn" role="tab" data-nav="learn" aria-selected="false"><span class="tabs__icon" aria-hidden="true">📚</span><span class="tabs__label">レッスン</span></button>
         <button class="tabs__btn" role="tab" data-nav="culture" aria-selected="false"><span class="tabs__icon" aria-hidden="true">📖</span><span class="tabs__label">文化ガイド</span></button>
         <button class="tabs__btn" role="tab" data-nav="quiz" aria-selected="false"><span class="tabs__icon" aria-hidden="true">🎯</span><span class="tabs__label">クイズ</span></button>
       </nav>
@@ -131,6 +133,12 @@
             <span class="nav-card__desc">永遠の都からエーゲ海の島へ。ローマ・バチカン・サントリーニを歩く相棒。</span>
             <span class="nav-card__go" aria-hidden="true">→</span>
           </a>
+          <a class="nav-card" href="app-it.html">
+            <span class="nav-card__icon" aria-hidden="true">🇮🇹</span>
+            <span class="nav-card__title">旅するイタリア語</span>
+            <span class="nav-card__desc">テラコッタの街角からドゥオーモへ。フレーズ・レッスン・文化を、発音つきで。仏語版と対になるアプリ。</span>
+            <span class="nav-card__go" aria-hidden="true">→</span>
+          </a>
         </div>
       </div>
     </section>
@@ -143,6 +151,15 @@
       </div>
       <div id="phraseChips" class="chips" role="toolbar" aria-label="カテゴリで絞り込み"></div>
       <div id="phraseList" class="phrase-grid" aria-live="polite"></div>
+    </section>
+
+    <!-- レッスン -->
+    <section id="view-learn" class="view" role="tabpanel" aria-label="レッスン" tabindex="-1" hidden>
+      <div class="view__head">
+        <h1 class="view__title">レッスン</h1>
+        <p class="view__lead">毎日5分。忘れかけた頃に思い出すから、身につく。</p>
+      </div>
+      <div id="learnRoot" class="learn-mount"></div>
     </section>
 
     <!-- 文化ガイド -->
@@ -194,6 +211,7 @@
   <script src="data/culture.js"></script>
   <script src="data/photos.js"></script>
   <script src="js/quiz.js"></script>
+  <script src="js/learn.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

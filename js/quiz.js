@@ -218,7 +218,7 @@
       var best = getBest();
       container.innerHTML =
         '<div class="quiz-start">' +
-          '<div class="quiz-icon">🇫🇷</div>' +
+          '<div class="quiz-icon">' + (window.APP_QUIZ_ICON || '🇫🇷') + '</div>' +
           '<h2 class="quiz-title">フレーズクイズ</h2>' +
           '<p class="quiz-desc">覚えたフレーズ、旅先で使えるか試してみましょう。意味当てとリスニング、全' + QUESTION_COUNT + '問です。</p>' +
           (best > 0

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Voyage — 旅するイタリア語。イタリア旅行を最高に楽しむためのフレーズ & 文化アプリ。">
+  <meta name="color-scheme" content="light dark">
+  <title>Voyage — 旅するイタリア語</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🇮🇹%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/learn.css">
+  <!-- テーマのちらつき防止: 描画前に保存済みテーマを適用(index.html と同一) -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('voyage.theme');
+        if (!t) {
+          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <!-- イタリアの朝のヒーロー配色: 空色 → オリーブ → テラコッタ。
+       style.css は編集せず、このページ内でヒーローの空とスカイラインだけ上書きする。
+       スカイラインは糸杉(イタリアの緑)で、国旗の緑をさりげない差し色に。 -->
+  <style>
+    .hero {
+      background:
+        linear-gradient(180deg,
+          #2e6f97 0%,
+          #4f93bd 16%,
+          #9dc0c2 38%,
+          #c3bd93 56%,
+          #c68a58 74%,
+          #b0633b 90%,
+          #97502e 100%);
+    }
+    [data-theme="dark"] .hero {
+      background:
+        linear-gradient(180deg,
+          #06121c 0%,
+          #0e2739 24%,
+          #223f3a 46%,
+          #4d3d2e 66%,
+          #7c4a2c 88%,
+          #8f5730 100%);
+    }
+    /* 糸杉の緑をスカイラインに。国旗の緑をさりげなく忍ばせる */
+    .hero__skyline { color: #253a26; opacity: .92; }
+    [data-theme="dark"] .hero__skyline { color: #05070a; }
+    .hero__eyebrow { color: #eef2d6; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へスキップ</a>
+
+  <!-- ヘッダー -->
+  <header class="app-header">
+    <div class="app-header__inner">
+      <a class="brand" href="#" data-nav="home" aria-label="Voyage ホーム">
+        <span class="brand__mark" aria-hidden="true">
+          <!-- 糸杉(イタリア)のインラインSVGシルエット -->
+          <svg viewBox="0 0 24 40" width="18" height="30" fill="currentColor" role="img">
+            <path d="M9.4 40v-3.4c-1.7-.5-2.7-2-2.7-5.1 0-2.3.4-4.1.9-5.6-1 .3-1.8.2-2.3-.6 1-.4 1.5-1.4 1.8-2.9-.9.4-1.7.2-2.2-.7 1.1-.4 1.7-1.6 2-3.4-.9.5-1.7.3-2.2-.6 1.4-.6 2.1-2.3 2.4-4.8C7.3 3.4 9.2.7 12 0c2.8.7 4.7 3.4 4.9 7.5.3 2.5 1 4.2 2.4 4.8-.5.9-1.3 1.1-2.2.6.3 1.8.9 3 2 3.4-.5.9-1.3 1.1-2.2.7.3 1.5.8 2.5 1.8 2.9-.5.8-1.3.9-2.3.6.5 1.5.9 3.3.9 5.6 0 3.1-1 4.6-2.7 5.1V40z"/>
+          </svg>
+        </span>
+        <span class="brand__text">
+          <span class="brand__name">Voyage</span>
+          <span class="brand__sub">旅するイタリア語</span>
+        </span>
+      </a>
+
+      <nav class="tabs" role="tablist" aria-label="メインナビゲーション">
+        <button class="tabs__btn is-active" role="tab" data-nav="home" aria-selected="true"><span class="tabs__icon" aria-hidden="true">🌅</span><span class="tabs__label">ホーム</span></button>
+        <button class="tabs__btn" role="tab" data-nav="phrases" aria-selected="false"><span class="tabs__icon" aria-hidden="true">💬</span><span class="tabs__label">フレーズ集</span></button>
+        <button class="tabs__btn" role="tab" data-nav="learn" aria-selected="false"><span class="tabs__icon" aria-hidden="true">📚</span><span class="tabs__label">レッスン</span></button>
+        <button class="tabs__btn" role="tab" data-nav="culture" aria-selected="false"><span class="tabs__icon" aria-hidden="true">📖</span><span class="tabs__label">文化ガイド</span></button>
+        <button class="tabs__btn" role="tab" data-nav="quiz" aria-selected="false"><span class="tabs__icon" aria-hidden="true">🎯</span><span class="tabs__label">クイズ</span></button>
+      </nav>
+
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="テーマ切替" title="ライト / ダーク切替">
+        <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">☀️</span>
+        <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- メイン -->
+  <main id="main" class="app-main">
+
+    <!-- ホーム -->
+    <section id="view-home" class="view is-active" role="tabpanel" aria-label="ホーム" tabindex="-1">
+      <div class="hero">
+        <div class="hero__sky" aria-hidden="true">
+          <span class="hero__sun"></span>
+          <svg class="hero__skyline" viewBox="0 0 1200 220" preserveAspectRatio="xMidYMax meet" role="img" aria-label="イタリアの街並みのシルエット">
+            <g fill="currentColor">
+              <!-- 丘陵の地平線(トスカーナの起伏) -->
+              <path d="M0 220 L0 192 Q 120 178 260 186 Q 430 196 600 186 Q 780 176 960 187 Q 1090 194 1200 184 L1200 220 Z"/>
+              <!-- 糸杉の並木(左) -->
+              <path d="M70 194 C 63 150 66 116 70 96 C 74 116 77 150 70 194 Z"/>
+              <path d="M104 198 C 96 138 99 96 104 72 C 109 96 112 138 104 198 Z"/>
+              <path d="M138 195 C 131 148 134 116 138 98 C 142 116 145 148 138 195 Z"/>
+              <path d="M170 193 C 164 154 166 126 170 108 C 174 126 176 154 170 193 Z"/>
+              <!-- ジョットの鐘楼 -->
+              <path d="M244 192 L244 104 L266 104 L266 192 Z"/>
+              <path d="M244 104 L255 92 L266 104 Z"/>
+              <!-- フィレンツェのドゥオーモ(クーポラ + ランタン) -->
+              <path d="M304 192 L304 150 L396 150 L396 192 Z"/>
+              <path d="M320 150 L320 122 L380 122 L380 150 Z"/>
+              <path d="M320 122 Q 324 80 350 64 Q 376 80 380 122 Z"/>
+              <path d="M343 64 L343 50 L357 50 L357 64 Z"/>
+              <path d="M346 50 L350 40 L354 50 Z"/>
+              <!-- 街の屋根(フィラー) -->
+              <path d="M412 192 L412 166 L440 166 L440 192 Z"/>
+              <path d="M408 166 L426 152 L444 166 Z"/>
+              <path d="M446 192 L446 172 L470 172 L470 192 Z"/>
+              <path d="M443 172 L458 160 L473 172 Z"/>
+              <!-- コロッセオ(アーチのアーケード / 崩れた外壁) -->
+              <path fill-rule="evenodd" d="M560 192 L560 122 Q 562 106 578 102 Q 690 88 780 96 L784 80 Q 812 82 824 100 Q 832 106 832 122 L832 192 Z
+                M575 192 L575 152 Q 575 140 584 140 Q 593 140 593 152 L593 192 Z
+                M603 192 L603 152 Q 603 140 612 140 Q 621 140 621 152 L621 192 Z
+                M631 192 L631 152 Q 631 140 640 140 Q 649 140 649 152 L649 192 Z
+                M659 192 L659 152 Q 659 140 668 140 Q 677 140 677 152 L677 192 Z
+                M687 192 L687 152 Q 687 140 696 140 Q 705 140 705 152 L705 192 Z
+                M715 192 L715 152 Q 715 140 724 140 Q 733 140 733 152 L733 192 Z
+                M743 192 L743 152 Q 743 140 752 140 Q 761 140 761 152 L761 192 Z
+                M771 192 L771 152 Q 771 140 780 140 Q 789 140 789 152 L789 192 Z
+                M799 192 L799 152 Q 799 140 808 140 Q 817 140 817 152 L817 192 Z
+                M576 132 L576 120 Q 576 111 584 111 Q 592 111 592 120 L592 132 Z
+                M604 132 L604 120 Q 604 111 612 111 Q 620 111 620 120 L620 132 Z
+                M632 132 L632 120 Q 632 111 640 111 Q 648 111 648 120 L648 132 Z
+                M660 132 L660 120 Q 660 111 668 111 Q 676 111 676 120 L676 132 Z
+                M688 132 L688 120 Q 688 111 696 111 Q 704 111 704 120 L704 132 Z
+                M716 132 L716 120 Q 716 111 724 111 Q 732 111 732 120 L732 132 Z
+                M744 132 L744 120 Q 744 111 752 111 Q 760 111 760 120 L760 132 Z"/>
+              <!-- 傘松(ローマの石松) -->
+              <path d="M876 192 L876 138 L882 138 L882 192 Z"/>
+              <path d="M852 138 Q 879 112 906 138 Q 894 128 879 127 Q 864 128 852 138 Z"/>
+              <!-- 家並み(フィラー) -->
+              <path d="M918 192 L918 168 L946 168 L946 192 Z"/>
+              <path d="M914 168 L932 154 L950 168 Z"/>
+              <!-- ピサの斜塔(右に傾く) -->
+              <path d="M994 192 L1010 90 L1030 88 L1014 192 Z"/>
+              <path d="M1008 90 L1010 78 L1032 76 L1030 88 Z"/>
+              <path d="M1010 78 L1021 72 L1032 76 Z"/>
+              <!-- 糸杉と家(右) -->
+              <path d="M1110 193 C 1104 150 1106 120 1110 102 C 1114 120 1116 150 1110 193 Z"/>
+              <path d="M1140 192 L1140 170 L1166 170 L1166 192 Z"/>
+              <path d="M1137 170 L1153 158 L1169 170 Z"/>
+            </g>
+          </svg>
+        </div>
+        <div class="hero__content">
+          <p class="hero__eyebrow">Buongiorno, viaggiatore.</p>
+          <h1 class="hero__title"><span>イタリアの朝が、</span><br><span>あなたを待っている。</span></h1>
+          <p class="hero__lead">「勉強」ではなく「旅の予感」。カプチーノの湯気、石畳を照らす朝陽、広場に響く Buongiorno。声に出せば、その一言が旅先で本当に使える魔法になる。さあ、旅するイタリア語を始めましょう。</p>
+          <div class="hero__actions">
+            <button class="btn btn-primary" data-nav="phrases" type="button">💬 フレーズを見る</button>
+            <button class="btn" data-nav="learn" type="button">📚 今日のレッスン</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 今日のフレーズ -->
+      <div class="section">
+        <div class="section__head">
+          <h2 class="section__title">今日のフレーズ</h2>
+          <p class="section__desc">毎日ひとつ、旅の一言を。</p>
+        </div>
+        <div id="dailyPhrase" class="daily"></div>
+      </div>
+
+      <!-- イタリアの風景(写真ギャラリー) -->
+      <div class="section gallery-section" id="gallerySection" hidden>
+        <div class="section__head">
+          <h2 class="section__title">イタリアの風景</h2>
+          <p class="section__desc">タップして、旅の情景に一歩近づく。</p>
+        </div>
+        <div id="photoGallery" class="gallery" role="list" aria-label="イタリアの風景写真"></div>
+      </div>
+
+      <!-- 導線カード -->
+      <div class="section">
+        <div class="section__head">
+          <h2 class="section__title">旅の準備をはじめる</h2>
+        </div>
+        <div class="nav-cards">
+          <button class="nav-card" data-nav="phrases" type="button">
+            <span class="nav-card__icon" aria-hidden="true">💬</span>
+            <span class="nav-card__title">フレーズ集</span>
+            <span class="nav-card__desc">バール・トラットリア・買い物。場面別に使える一言を、発音つきで。</span>
+            <span class="nav-card__go" aria-hidden="true">→</span>
+          </button>
+          <button class="nav-card" data-nav="learn" type="button">
+            <span class="nav-card__icon" aria-hidden="true">📚</span>
+            <span class="nav-card__title">レッスン</span>
+            <span class="nav-card__desc">間隔反復と想起練習で、一日約5分。フレーズを「身につく」まで。</span>
+            <span class="nav-card__go" aria-hidden="true">→</span>
+          </button>
+          <button class="nav-card" data-nav="culture" type="button">
+            <span class="nav-card__icon" aria-hidden="true">📖</span>
+            <span class="nav-card__title">文化ガイド</span>
+            <span class="nav-card__desc">マナー・食・暮らしの知恵。知れば旅がぐっと深くなる読み物。</span>
+            <span class="nav-card__go" aria-hidden="true">→</span>
+          </button>
+          <button class="nav-card" data-nav="quiz" type="button">
+            <span class="nav-card__icon" aria-hidden="true">🎯</span>
+            <span class="nav-card__title">クイズ</span>
+            <span class="nav-card__desc">意味当て & リスニング。10問で、覚えたフレーズを確かめよう。</span>
+            <span class="nav-card__go" aria-hidden="true">→</span>
+          </button>
+          <a class="nav-card" href="index.html">
+            <span class="nav-card__icon" aria-hidden="true">🇫🇷</span>
+            <span class="nav-card__title">旅するフランス語</span>
+            <span class="nav-card__desc">もうひとつの旅へ。パリの朝からはじまる、フランス語のアプリ。</span>
+            <span class="nav-card__go" aria-hidden="true">→</span>
+          </a>
+          <a class="nav-card" href="guide-it.html">
+            <span class="nav-card__icon" aria-hidden="true">🏛️</span>
+            <span class="nav-card__title">ローマ&amp;サントリーニ ガイド</span>
+            <span class="nav-card__desc">永遠の都からエーゲ海の島へ。ローマ・バチカン・サントリーニを歩く相棒。</span>
+            <span class="nav-card__go" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- フレーズ集 -->
+    <section id="view-phrases" class="view" role="tabpanel" aria-label="フレーズ集" tabindex="-1" hidden>
+      <div class="view__head">
+        <h1 class="view__title">フレーズ集</h1>
+        <p class="view__lead">場面を選んで、旅先で使える一言を。☆でお気に入りに保存できます。</p>
+      </div>
+      <div id="phraseChips" class="chips" role="toolbar" aria-label="カテゴリで絞り込み"></div>
+      <div id="phraseList" class="phrase-grid" aria-live="polite"></div>
+    </section>
+
+    <!-- レッスン -->
+    <section id="view-learn" class="view" role="tabpanel" aria-label="レッスン" tabindex="-1" hidden>
+      <div class="view__head">
+        <h1 class="view__title">レッスン</h1>
+        <p class="view__lead">今日のレッスンは約5分。間隔をあけて思い出し、声に出して、体にしみこませよう。</p>
+      </div>
+      <div id="learnRoot" class="learn-mount quiz-mount"></div>
+    </section>
+
+    <!-- 文化ガイド -->
+    <section id="view-culture" class="view" role="tabpanel" aria-label="文化ガイド" tabindex="-1" hidden>
+      <div class="view__head">
+        <h1 class="view__title">文化ガイド</h1>
+        <p class="view__lead">知っておくと旅が変わる、イタリアの作法と暮らしの知恵。</p>
+      </div>
+      <div id="cultureChips" class="chips" role="toolbar" aria-label="カテゴリで絞り込み"></div>
+      <div id="cultureList" class="culture-grid" aria-live="polite"></div>
+    </section>
+
+    <!-- クイズ -->
+    <section id="view-quiz" class="view" role="tabpanel" aria-label="クイズ" tabindex="-1" hidden>
+      <div class="view__head">
+        <h1 class="view__title">クイズ</h1>
+        <p class="view__lead">全10問。意味当てとリスニングで、フレーズの記憶を確かめよう。</p>
+      </div>
+      <div id="quizRoot" class="quiz-mount"></div>
+    </section>
+
+  </main>
+
+  <!-- モーダル(文化ガイド全文) -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="document">
+      <button class="modal__close" type="button" aria-label="閉じる" data-close>✕</button>
+      <div id="modalBody" class="modal__body"></div>
+    </div>
+  </div>
+
+  <!-- ライトボックス(写真拡大) -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden>
+    <div class="lightbox__backdrop" data-lb-close></div>
+    <figure class="lightbox__panel" role="document">
+      <button class="lightbox__close" type="button" aria-label="閉じる" data-lb-close>✕</button>
+      <div id="lightboxStage" class="lightbox__stage"></div>
+      <figcaption id="lightboxCaption" class="lightbox__caption"></figcaption>
+    </figure>
+  </div>
+
+  <footer class="app-footer">
+    <p>Voyage — 旅するイタリア語 · 良い一日を。<span class="app-footer__fr">Buona giornata !</span></p>
+  </footer>
+
+  <!-- 言語設定(データ / スクリプトより前に定義): 音声・保存キーをイタリア語版に -->
+  <script>
+    window.APP_LANG = 'it-IT';
+    window.APP_FAV_KEY = 'voyage.it.favs';
+    window.APP_QUIZ_KEY = 'voyage.it.quiz.best';
+    window.APP_STORE_PREFIX = 'voyage.it';
+    window.APP_QUIZ_ICON = '🇮🇹';
+  </script>
+
+  <!-- データ → クイズ → レッスン → アプリ本体 の順で読み込む(DESIGN.md イタリア編 準拠) -->
+  <script src="data/phrases-it.js"></script>
+  <script src="data/culture-it.js"></script>
+  <script src="data/photos-it.js"></script>
+  <script src="data/dialogues-it.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/learn.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
