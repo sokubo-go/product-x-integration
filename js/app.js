@@ -43,17 +43,19 @@
   }
 
   // =========================================================
-  // 音声 (Web Speech API / fr-FR)
+  // 音声 (Web Speech API)— 既定言語は window.APP_LANG(なければ fr-FR)
   // =========================================================
   var synth = window.speechSynthesis || null;
-  var frVoice = null;
+  var APP_LANG = window.APP_LANG || 'fr-FR';
+  var langVoice = null;
   function pickVoice() {
     if (!synth) return;
     var voices = synth.getVoices() || [];
-    // フランス語ボイスを優先(女性/Google/Amélie 等があれば尚可)
-    frVoice = voices.find(function (v) { return /fr[-_]FR/i.test(v.lang); })
-           || voices.find(function (v) { return /^fr/i.test(v.lang); })
-           || null;
+    var full = new RegExp(APP_LANG.replace('-', '[-_]'), 'i');
+    var prefix = new RegExp('^' + APP_LANG.split('-')[0], 'i');
+    langVoice = voices.find(function (v) { return full.test(v.lang); })
+             || voices.find(function (v) { return prefix.test(v.lang); })
+             || null;
   }
   if (synth) {
     pickVoice();
@@ -67,18 +69,18 @@
     if (activeBtn) { activeBtn.classList.remove('is-speaking'); activeBtn = null; }
   }
 
-  // 公開する speak(text[, btn])
-  function speak(text, btn) {
+  // 公開する speak(text[, btn][, rate])— rate はシャドーイングのスロー再生用
+  function speak(text, btn, rate) {
     if (!text) return;
     if (!synth || typeof window.SpeechSynthesisUtterance === 'undefined') return;
     try {
       synth.cancel();          // 連打時に前の再生を止める
       clearSpeakingState();
       var u = new SpeechSynthesisUtterance(text);
-      u.lang = 'fr-FR';
-      u.rate = 0.92;
+      u.lang = APP_LANG;
+      u.rate = typeof rate === 'number' ? rate : 0.92;
       u.pitch = 1.0;
-      if (frVoice) u.voice = frVoice;
+      if (langVoice) u.voice = langVoice;
       if (btn) {
         activeBtn = btn;
         btn.classList.add('is-speaking');
@@ -111,15 +113,16 @@
   }
 
   // =========================================================
-  // お気に入り (localStorage: voyage.favs)
+  // お気に入り (localStorage: window.APP_FAV_KEY / 既定 voyage.favs)
   // =========================================================
+  var FAV_KEY = window.APP_FAV_KEY || 'voyage.favs';
   var favs = loadFavs();
   function loadFavs() {
-    try { return JSON.parse(localStorage.getItem('voyage.favs') || '[]') || []; }
+    try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]') || []; }
     catch (e) { return []; }
   }
   function saveFavs() {
-    try { localStorage.setItem('voyage.favs', JSON.stringify(favs)); } catch (e) {}
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch (e) {}
   }
   function isFav(key) { return favs.indexOf(key) !== -1; }
   function toggleFav(key) {
@@ -395,7 +398,7 @@
   // =========================================================
   // ナビゲーション
   // =========================================================
-  var VIEWS = ['home', 'phrases', 'culture', 'quiz'];
+  var VIEWS = ['home', 'phrases', 'learn', 'culture', 'quiz'];
   var current = 'home';
   var quizInited = false;
 
@@ -422,11 +425,32 @@
     clearSpeakingState();
 
     if (view === 'quiz') initQuiz();
+    if (view === 'learn') initLearn();
 
     // フォーカスとスクロール
     var sec = $('#view-' + view);
     if (sec) { try { sec.focus({ preventScroll: true }); } catch (e) {} }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function initLearn() {
+    var mount = $('#learnRoot');
+    if (!mount) return;
+    if (window.Learn && typeof window.Learn.init === 'function') {
+      try {
+        window.Learn.init(mount, {
+          phrasesData: PHRASES,
+          dialogues: window.DIALOGUES_DATA || [],
+          speak: speak,
+          lang: APP_LANG,
+          storagePrefix: window.APP_STORE_PREFIX || 'voyage.fr'
+        });
+      } catch (e) {
+        mount.innerHTML = '<div class="quiz-fallback">レッスンの読み込みに失敗しました。</div>';
+      }
+    } else {
+      mount.innerHTML = '<div class="quiz-fallback"><p style="font-size:2rem;margin:0 0 8px">📚</p>レッスンを準備中です。</div>';
+    }
   }
 
   function initQuiz() {

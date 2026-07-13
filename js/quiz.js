@@ -7,7 +7,7 @@
   'use strict';
 
   var STYLE_ID = 'quiz-style';
-  var BEST_KEY = 'voyage.quiz.best';
+  var BEST_KEY = window.APP_QUIZ_KEY || 'voyage.quiz.best';
   var QUESTION_COUNT = 10;
   var WRONG_CHOICE_COUNT = 3;
 

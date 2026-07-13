@@ -250,6 +250,70 @@ window.GUIDE_DAY = {
 - 読み込み順: guide-it-roma → guide-it-vaticano → guide-it-santorini → guide.js → leaflet → geo-it.js → real-map.js
 - index.html のホームにイタリア編への導線カードを追加。両ガイドのヘッダーで相互リンク
 
+## 学習システム(レッスン)と イタリア語版アプリ(app-it.html)
+
+「読む」から「身につく」へ。SRS(間隔反復)+想起練習+シャドーイング+シーン会話ドリルを
+「レッスン」タブとして実装。仏語版(index.html)と伊語版(app-it.html)で共用する。
+
+### 多言語プラミング(app.js / quiz.js)
+
+- `window.APP_LANG`(既定 'fr-FR')… 音声言語。app-it.html は 'it-IT'
+- `window.APP_FAV_KEY`(既定 'voyage.favs')/ `window.APP_QUIZ_KEY`(既定 'voyage.quiz.best')
+- `window.APP_STORE_PREFIX`(既定 'voyage.fr')… レッスンの保存プレフィックス。伊語版は 'voyage.it'
+- データファイルはページごとに同じグローバル名(PHRASES_DATA / CULTURE_DATA / PHOTOS_DATA)を定義
+
+### js/learn.js + css/learn.css の契約
+
+```js
+window.Learn = {
+  // conf: { phrasesData, dialogues, speak(text, btn?, rate?), lang, storagePrefix }
+  init(container, conf) { ... }  // 再入可
+}
+```
+
+- **SRS**: ライトナー5箱。間隔(日)= box1:0 / box2:1 / box3:3 / box4:7 / box5:16。
+  保存: `<prefix>.srs` = { "catId::フレーズ": { box, due(通算日), seen, ok } }。新規は1日10枚まで
+- **セッション構成**: 期限到来カード最大12枚 + 新規最大6枚をシャッフル。出題形式は箱で変える:
+  box1-2 = 認識(伊→和4択 / リスニング4択)、box3+ = 想起フリップ(和→伊。「声に出してから」めくり、
+  自己評価「言えた→box+1 / まだ→box=1」)。3枚に1枚の頻度でシャドーイング挿入(音声→スロー→リピート)
+- **シーン会話ドリル**: DIALOGUES_DATA を順に再生。相手ターン=伊語+音声+和訳。自分ターン=和ヒント表示→
+  「答えを見る」→伊語+カナ+音声+シャドーイング。最後に通し再生。完了記録 `<prefix>.scenes`
+- **習慣化**: `<prefix>.streak` { last, count }。ホーム/レッスン冒頭に「今日のレッスン(約5分)」導線、
+  ストリーク🔥表示、カテゴリ別定着率(box4以上の割合)
+- スタイルは learn.css(トークン契約準拠・両テーマ)。音声は conf.speak を使用(rate 指定でスロー再生)
+
+### data/dialogues-it.js の契約
+
+```js
+window.DIALOGUES_DATA = [{
+  id: "bar",            // 英小文字スラッグ
+  title: "バールで朝食",
+  icon: "☕",
+  desc: "カウンターでカプチーノとコルネットを頼む",
+  turns: [
+    { speaker: "them", name: "バリスタ", it: "Buongiorno! Mi dica.", ja: "おはようございます!ご注文は?", kana: "ボンジョルノ!ミ ディーカ" },
+    { speaker: "you",  hint: "カプチーノを1つください、と言ってみよう",
+      it: "Un cappuccino, per favore.", ja: "カプチーノを1つください", kana: "ウン カプチーノ ペル ファヴォーレ" }
+  ]
+}]
+```
+
+### app-it.html(旅するイタリア語)
+
+- index.html の構造を踏襲した5タブ: ホーム / フレーズ集 / レッスン / 文化ガイド / クイズ
+- ヒーロー: イタリアの朝(テラコッタとオリーブ、糸杉とドゥオーモのスカイラインSVG)
+- 読み込み: phrases-it → culture-it → photos-it → dialogues-it → quiz.js → learn.js → app.js
+  (直前に APP_LANG='it-IT' / APP_FAV_KEY / APP_QUIZ_KEY / APP_STORE_PREFIX を定義)
+- index.html(仏語版)にも「レッスン」タブを追加(dialogues 未定義でもSRSだけで動く)し、
+  ホームに伊語版への導線カードを追加。両アプリのヘッダーで相互リンク
+
+### data/phrases-it.js / culture-it.js / photos-it.js
+
+- phrases-it: 仏語版と同じ10カテゴリ構成・同契約(fr フィールドにイタリア語)で約110句
+- culture-it: イタリア文化記事12本(バール文化、アペリティーボ、コペルト、ジェスチャー、
+  食後のカプチーノ問題、リポーゾ、切符の刻印、教会の服装、広場の暮らし、チップ、ジェラート、Ferragosto 等)
+- photos-it: 16スポット(既存 PHOTOS_DATA 契約。wiki は英語版タイトル)
+
 ## 検証
 
 Playwright(内蔵 Chromium)で実際に開き、全タブ・音声ボタン・クイズ一巡・
