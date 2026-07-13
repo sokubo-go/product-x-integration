@@ -9,6 +9,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🇮🇹%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/learn.css">
+  <link rel="stylesheet" href="css/style-it-refresh.css">
   <!-- テーマのちらつき防止: 描画前に保存済みテーマを適用(index.html と同一) -->
   <script>
     (function () {
@@ -155,12 +156,41 @@
         <div class="hero__content">
           <p class="hero__eyebrow">Buongiorno, viaggiatore</p>
           <h1 class="hero__title"><span>イタリアの朝が、</span><br><span>あなたを待っている。</span></h1>
-          <p class="hero__lead">「勉強」ではなく「旅の予感」。カプチーノの湯気、石畳を照らす朝陽、広場に響く Buongiorno。声に出せば、その一言が旅先で本当に使える魔法になる。さあ、旅するイタリア語を始めましょう。</p>
+          <p class="hero__lead">旅先で本当に使えるイタリア語を、一日5分から。声に出して覚えれば、バールでも街角でも、その一言が旅をもっと自由にします。</p>
           <div class="hero__actions">
             <button class="btn btn-primary" data-nav="phrases" type="button">フレーズを見る</button>
             <button class="btn" data-nav="learn" type="button">今日のレッスン</button>
           </div>
           <p class="hero__route" aria-hidden="true">Roma — Firenze — Santorini</p>
+        </div>
+      </div>
+
+      <!-- はじめての3ステップ -->
+      <div class="section">
+        <div class="section__head">
+          <p class="kicker">Primo passo</p>
+          <h2 class="section__title">まずは3ステップで始める</h2>
+          <p class="section__desc">はじめてでも、この順番なら迷いません。</p>
+        </div>
+        <div class="quick-start-grid">
+          <div class="quick-start-card">
+            <div class="quick-start-card__step">1</div>
+            <h3 class="quick-start-card__title">フレーズを1つ聞く</h3>
+            <p class="quick-start-card__desc">旅先でそのまま使える一言を、音で聞いて口に出してみましょう。</p>
+            <button class="btn" data-nav="phrases" type="button">フレーズ集へ</button>
+          </div>
+          <div class="quick-start-card">
+            <div class="quick-start-card__step">2</div>
+            <h3 class="quick-start-card__title">5分だけレッスン</h3>
+            <p class="quick-start-card__desc">基礎文法と復習カードで、最初の達成感をすぐに。</p>
+            <button class="btn" data-nav="learn" type="button">レッスンへ</button>
+          </div>
+          <div class="quick-start-card">
+            <div class="quick-start-card__step">3</div>
+            <h3 class="quick-start-card__title">クイズで確認</h3>
+            <p class="quick-start-card__desc">意味当てとリスニングで「使える状態か」を手軽にチェック。</p>
+            <button class="btn" data-nav="quiz" type="button">クイズへ</button>
+          </div>
         </div>
       </div>
 
@@ -172,6 +202,38 @@
           <p class="section__desc">毎日ひとつ、旅の一言を。</p>
         </div>
         <div id="dailyPhrase" class="daily"></div>
+      </div>
+
+      <!-- 描かれたイタリア(同梱イラスト・オフラインでも表示) -->
+      <div class="section">
+        <div class="section__head">
+          <p class="kicker">Scorci d'Italia</p>
+          <h2 class="section__title">描かれたイタリア</h2>
+          <p class="section__desc">絵で旅する、三都市。</p>
+        </div>
+        <div class="gallery-manual">
+          <a class="gallery-manual__item" href="assets/italy/rome-gallery.jpg" target="_blank" rel="noopener">
+            <img src="assets/italy/rome-gallery.jpg" alt="ローマの朝の街並みとカフェの風景" loading="lazy">
+            <div class="gallery-manual__body">
+              <h3 class="gallery-manual__title">Roma</h3>
+              <p class="gallery-manual__desc">石畳とカフェの朝。永遠の都はいつも劇場だ。</p>
+            </div>
+          </a>
+          <a class="gallery-manual__item" href="assets/italy/florence-gallery.jpg" target="_blank" rel="noopener">
+            <img src="assets/italy/florence-gallery.jpg" alt="フィレンツェの街並みとドゥオーモの眺め" loading="lazy">
+            <div class="gallery-manual__body">
+              <h3 class="gallery-manual__title">Firenze</h3>
+              <p class="gallery-manual__desc">ドゥオーモを望むテラス。芸術は街角にある。</p>
+            </div>
+          </a>
+          <a class="gallery-manual__item" href="assets/italy/venice-gallery.jpg" target="_blank" rel="noopener">
+            <img src="assets/italy/venice-gallery.jpg" alt="ヴェネツィアの静かな運河とゴンドラ" loading="lazy">
+            <div class="gallery-manual__body">
+              <h3 class="gallery-manual__title">Venezia</h3>
+              <p class="gallery-manual__desc">ゴンドラが行く静かな運河。水の都の非日常。</p>
+            </div>
+          </a>
+        </div>
       </div>
 
       <!-- イタリアの風景(写真ギャラリー) -->
@@ -188,7 +250,7 @@
       <div class="section">
         <div class="section__head">
           <p class="kicker">Imbarco</p>
-          <h2 class="section__title">旅の準備をはじめる</h2>
+          <h2 class="section__title">気になるところから始める</h2>
         </div>
         <div class="nav-cards">
           <button class="nav-card" data-nav="phrases" type="button">

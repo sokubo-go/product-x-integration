@@ -1,0 +1,170 @@
+:root {
+  --it-green: #1f5c45;
+  --it-green-deep: #143f32;
+  --it-terracotta: #b85f3b;
+  --it-sand: #e8d6b5;
+  --it-paper: #f8f5ee;
+  --it-shadow: 0 18px 50px rgba(25, 42, 35, .10);
+}
+
+[data-theme="dark"] {
+  --it-green: #76b99c;
+  --it-green-deep: #9ad0b7;
+  --it-terracotta: #dc8b68;
+  --it-sand: #9f8565;
+  --it-paper: #161b1a;
+  --it-shadow: 0 20px 56px rgba(0, 0, 0, .38);
+}
+
+body {
+  background:
+    radial-gradient(circle at 100% 0, rgba(31, 92, 69, .08), transparent 34rem),
+    var(--bg);
+}
+
+.app-main { max-width: 1160px; padding-top: 32px; }
+.app-header { border-bottom-color: color-mix(in srgb, var(--line) 72%, transparent); }
+.app-header__inner { max-width: 1160px; gap: 24px; }
+.brand__mark { background: var(--it-green); border-radius: 8px; box-shadow: 0 8px 22px rgba(31, 92, 69, .18); }
+.brand__name { letter-spacing: -.015em; }
+.tabs { gap: 6px; }
+.tabs__btn { min-height: 42px; padding-inline: 13px; border: 1px solid transparent; border-radius: var(--radius); }
+.tabs__btn:hover { border-color: color-mix(in srgb, var(--it-green) 20%, transparent); }
+.tabs__btn.is-active { color: var(--it-green); border-color: color-mix(in srgb, var(--it-green) 24%, transparent); background: color-mix(in srgb, var(--it-green) 10%, transparent); }
+.theme-toggle { border-radius: var(--radius); }
+
+.hero {
+  min-height: 560px;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: var(--it-shadow);
+  background:
+    linear-gradient(100deg, rgba(18, 47, 38, .92) 0%, rgba(29, 74, 58, .78) 42%, rgba(184, 95, 59, .18) 75%),
+    url("../assets/italy/hero-florence-morning.jpg") center center / cover no-repeat;
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(10, 29, 24, .52), transparent 58%),
+    radial-gradient(circle at 80% 28%, rgba(255, 236, 185, .25), transparent 20rem);
+}
+.hero::after { inset: 14px; border-radius: 8px; border-color: rgba(255,255,255,.28); }
+[data-theme="dark"] .hero {
+  background:
+    linear-gradient(100deg, rgba(4, 14, 12, .96) 0%, rgba(18, 49, 39, .84) 48%, rgba(105, 56, 40, .28) 78%),
+    url("../assets/italy/hero-florence-morning.jpg") center center / cover no-repeat;
+}
+.hero__sky { display:none; }
+.hero__content { max-width: 720px; padding: clamp(60px, 8vw, 96px) clamp(34px, 7vw, 78px) clamp(120px, 15vw, 156px); }
+.hero__eyebrow {
+  display: inline-flex; align-items: center; gap: 10px; margin-bottom: 22px; padding: 7px 12px;
+  color: #fff9eb; background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.22); border-radius: 4px;
+  backdrop-filter: blur(8px);
+}
+.hero__eyebrow::before { content: ""; width:7px; height:7px; border-radius:50%; background:#e7c777; box-shadow:0 0 0 5px rgba(231,199,119,.14); }
+.hero__title { max-width:660px; margin-bottom:20px; font-size:clamp(2.1rem, 4.6vw, 3.6rem); line-height:1.1; letter-spacing:-.035em; text-wrap:balance; }
+.hero__lead { max-width:48ch; margin-bottom:32px; font-size:clamp(1rem, 1.7vw, 1.16rem); line-height:1.85; color:rgba(255, 250, 241, .91); }
+.hero__actions { gap: 12px; }
+.hero__actions .btn { min-height: 50px; padding: 13px 22px; border-radius: var(--radius); font-weight: 750; }
+.hero__actions .btn-primary { color: var(--it-green-deep); background: #fffaf0; border-color: #fffaf0; box-shadow: 0 12px 30px rgba(13, 37, 30, .20); }
+.hero__route { max-width:520px; margin-top:34px; padding-top:18px; letter-spacing:.18em; color:rgba(255,255,255,.72); }
+
+.section { margin-top: 58px; }
+.section__head { display:grid; grid-template-columns:1fr auto; align-items:end; gap:6px 20px; margin-bottom:22px; padding-bottom:14px; }
+.section__head .kicker,.section__head .section__title { grid-column:1; }
+.section__desc { grid-column:2; grid-row:1 / span 2; max-width:32ch; text-align:right; }
+.kicker { color: var(--it-green); }
+.section__title, .view__title, .nav-card__title, .daily__fr { letter-spacing:-.018em; }
+
+.quick-start-grid {
+  display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;
+}
+.quick-start-card {
+  padding: 24px; border:1px solid var(--line); background:var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.quick-start-card__step {
+  display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; margin-bottom:12px;
+  border-radius:50%; font-size:.82rem; font-weight:800; background: color-mix(in srgb, var(--it-green) 14%, var(--surface)); color:var(--it-green);
+}
+.quick-start-card__title { font-family:var(--serif); font-size:1.18rem; margin:0 0 8px; }
+.quick-start-card__desc { margin:0 0 16px; color:var(--ink-soft); line-height:1.7; }
+.quick-start-card .btn { width:100%; justify-content:center; }
+
+.daily__card { padding:32px; gap:26px; border-radius:var(--radius); border-color: color-mix(in srgb, var(--it-green) 16%, var(--line)); box-shadow:0 14px 38px rgba(34, 47, 40, .07); }
+.daily__card::before { width: 5px; background: var(--it-green); }
+.daily__label { color: var(--it-green); }
+.daily__note { border-radius: 4px; }
+
+.nav-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.nav-card { min-height: 210px; padding: 26px; border-radius: var(--radius); box-shadow:none; }
+.nav-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(32, 48, 40, .10); border-color: color-mix(in srgb, var(--it-green) 46%, var(--line)); }
+.nav-card__icon { width:48px; height:48px; border-radius:8px; background: color-mix(in srgb, var(--it-green) 10%, var(--surface)); }
+.nav-card__title { font-size: 1.36rem; }
+.nav-card__desc { line-height:1.75; }
+.nav-card__go { margin-top:auto; color:var(--it-green); font-size:1.25rem; }
+
+.card, .phrase-card, .culture-card { border-radius: var(--radius); }
+.phrase-grid, .culture-grid { gap: 20px; }
+.phrase-card { padding:24px; }
+.chip { border-radius: var(--radius); }
+.chip.is-active { color:#fff; background:var(--it-green); border-color:var(--it-green); }
+
+.gallery-manual {
+  display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px;
+}
+.gallery-manual__item {
+  display:block; overflow:hidden; border-radius: var(--radius); border:1px solid var(--line); background:var(--surface); text-decoration:none; color:var(--ink);
+}
+.gallery-manual__item img { display:block; width:100%; aspect-ratio: 4/3; object-fit:cover; }
+.gallery-manual__body { padding:14px 16px 16px; }
+.gallery-manual__title { font-family:var(--serif); font-size:1.1rem; margin:0 0 6px; }
+.gallery-manual__desc { margin:0; color:var(--ink-soft); font-size:.92rem; line-height:1.6; }
+
+.app-footer { margin-top:30px; padding-block:30px 110px; border-top:1px solid var(--line); }
+
+@media (max-width: 900px) and (min-width: 721px) {
+  .tabs__label { display:none; }
+  .tabs__btn { width:42px; justify-content:center; padding-inline:0; }
+}
+@media (max-width: 900px) {
+  .hero { min-height:520px; }
+  .nav-cards, .gallery-manual, .quick-start-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+
+@media (max-width: 640px) {
+  :root { --header-h:58px; }
+  .app-header__inner { padding-inline:14px; }
+  .brand__mark { width:36px; height:36px; border-radius:8px; }
+  .brand__sub { display:none; }
+  .theme-toggle { width:38px; height:38px; }
+  .app-main { padding:16px 12px 96px; }
+  .hero { min-height:590px; border-radius:10px; }
+  .hero::after { inset:10px; border-radius:6px; }
+  .hero__content { padding:50px 26px 132px; }
+  .hero__eyebrow { margin-bottom:18px; font-size:.68rem; }
+  .hero__title { font-size:clamp(1.7rem, 7.6vw, 3rem); }
+  .hero__lead { display:-webkit-box; overflow:hidden; -webkit-line-clamp:4; -webkit-box-orient:vertical; font-size:.96rem; line-height:1.75; }
+  .hero__actions { display:grid; grid-template-columns:1fr; }
+  .hero__actions .btn { width:100%; }
+  .hero__route { font-size:.57rem; letter-spacing:.12em; }
+  .section { margin-top:44px; }
+  .section__head { display:block; }
+  .section__desc { max-width:none; text-align:left; }
+  .daily__card { padding:24px 20px 22px; }
+  .daily__quote { display:none; }
+  .daily__body { min-width:0; }
+  .nav-cards, .gallery-manual, .quick-start-grid { grid-template-columns:1fr; gap:12px; }
+  .nav-card { min-height:0; padding:20px; display:grid; grid-template-columns:48px 1fr auto; grid-template-areas:"icon title go" "icon desc go"; align-items:center; column-gap:14px; }
+  .nav-card__icon { grid-area:icon; }
+  .nav-card__title { grid-area:title; font-size:1.16rem; }
+  .nav-card__desc { grid-area:desc; font-size:.86rem; line-height:1.55; }
+  .nav-card__go { grid-area:go; margin:0; }
+  .phrase-grid, .culture-grid { grid-template-columns:1fr; }
+  .phrase-card { padding:20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;
+  }
+}
