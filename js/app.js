@@ -441,6 +441,8 @@
         window.Learn.init(mount, {
           phrasesData: PHRASES,
           dialogues: window.DIALOGUES_DATA || [],
+          grammar: window.GRAMMAR_DATA || [],
+          vocab: window.VOCAB_DATA || [],
           speak: speak,
           lang: APP_LANG,
           storagePrefix: window.APP_STORE_PREFIX || 'voyage.fr'

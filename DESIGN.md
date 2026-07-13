@@ -314,6 +314,59 @@ window.DIALOGUES_DATA = [{
   食後のカプチーノ問題、リポーゾ、切符の刻印、教会の服装、広場の暮らし、チップ、ジェラート、Ferragosto 等)
 - photos-it: 16スポット(既存 PHOTOS_DATA 契約。wiki は英語版タイトル)
 
+## 基礎文法コースと単語帳(レッスン拡張)
+
+### data/grammar-it.js / grammar-fr.js の契約
+
+```js
+window.GRAMMAR_DATA = [{
+  id: "pronuncia",            // 英小文字スラッグ
+  order: 1,
+  title: "発音のルール — ローマ字読みでほぼ通じる",
+  icon: "🔤",
+  intro: ["導入 1〜2段落(なぜこれを最初にやるのか)"],
+  points: [                   // ルールカード 2〜5個
+    { rule: "c は a/o/u の前で「カ行」、e/i の前で「チャ行」",
+      examples: [ { x: "ciao", ja: "やあ", kana: "チャオ" } ] }  // 例 2〜4個
+  ],
+  drills: [                   // 練習 4〜6問
+    { type: "choice", q: "「grazie」の読みは?", choices: ["グラッツィエ","グラジー","グレイス"], answer: 0, explain: "解説1文" },
+    { type: "fill",   q: "Vorrei ___ caffè.(コーヒーを1つ)", choices: ["un","una","il"], answer: 0, explain: "..." },
+    { type: "order",  q: "「私は日本人です」を組み立てよう", tokens: ["Sono","giapponese"], answer: "Sono giapponese", explain: "..." }
+  ]
+}]
+```
+
+- 伊: ①発音 ②名詞の性と単複 ③冠詞 ④essere ⑤avere ⑥規則動詞現在形(-are/-ere/-ire) ⑦形容詞の一致 ⑧疑問文 ⑨否定 non ⑩前置詞と冠詞前置詞 ⑪近過去 ⑫Vorrei/Potrei(丁寧な依頼)の12ユニット
+- 仏: ①発音とリエゾン ②名詞の性 ③冠詞 ④être ⑤avoir ⑥-er動詞現在形 ⑦形容詞の一致 ⑧疑問文(Est-ce que) ⑨否定 ne...pas ⑩前置詞と縮約(au/du) ⑪複合過去 ⑫Je voudrais(丁寧な依頼)の12ユニット
+- 例文は旅行会話に直結するものを使う(教科書例文でなく「その日使う文」)
+
+### data/vocab-it.js / vocab-fr.js の契約
+
+```js
+window.VOCAB_DATA = [{
+  id: "numbers", name: "数字", icon: "🔢",
+  words: [ { x: "uno", ja: "1", kana: "ウーノ", note: "任意" } ]
+}]
+```
+
+- カテゴリ12個(順に): numbers(数字)/ days(曜日・月・時)/ food(食べ物)/ drinks(飲み物)/
+  colors-adj(色と形容詞)/ places(場所・方向)/ verbs(基本動詞)/ people(人・家族)/
+  weather(天気・気候)/ shopping(買い物の単語)/ body(体・体調)/ travel(旅の単語)。各15〜20語
+
+### learn.js の拡張
+
+- conf に grammar / vocab を追加(app.js が window.GRAMMAR_DATA / window.VOCAB_DATA を渡す)
+- レッスンホームの構成順: 今日の状況カード → **📖 基礎文法コース**(ユニット一覧+修了✓+進捗 n/12。
+  未修了が先頭に「まずはここから」)→ シーン会話ドリル → **📒 単語帳** → カテゴリ別定着率
+- 文法ユニットプレーヤー: intro → points(ルールカード、例文に🔊)→ drills(choice/fill=選択肢ボタン、
+  order=トークンをタップして文を組み立て・取り消し可)→ 正解で次へ、不正解は explain 表示後に再挑戦
+  → 修了画面(`${prefix}.grammar` = {unitId: true} 保存)
+- 単語帳: カテゴリカード(語数+追加済みn)→ 一覧(単語+カナ+訳+🔊+➕トグル)。
+  ➕で SRS デッキに追加(srs キーは `vocab::カテゴリid::単語`、box1・当日due)。「全部追加」ボタンあり。
+  SRSセッションは vocab キーのカードも出題できること(誤答選択肢は語彙+フレーズ全体から)
+- 文法ユニット修了もストリーク対象
+
 ## 検証
 
 Playwright(内蔵 Chromium)で実際に開き、全タブ・音声ボタン・クイズ一巡・
