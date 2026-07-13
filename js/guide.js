@@ -37,29 +37,37 @@
   }
 
   // =========================================================
-  // 音声(Web Speech API / fr-FR)— app.js の speak 相当
+  // 音声(Web Speech API)— 既定言語は window.GUIDE_LANG(なければ fr-FR)。
+  // フレーズ単位の lang 上書きにも対応(例: サントリーニのギリシャ語)。
   // =========================================================
   var synth = window.speechSynthesis || null;
-  var frVoice = null;
-  function pickVoice() {
-    if (!synth) return;
+  var DEFAULT_LANG = window.GUIDE_LANG || 'fr-FR';
+  var voiceCache = {};
+  function voiceFor(lang) {
+    if (!synth) return null;
+    if (voiceCache[lang] !== undefined) return voiceCache[lang];
     var voices = synth.getVoices() || [];
-    frVoice = voices.find(function (v) { return /fr[-_]FR/i.test(v.lang); })
-           || voices.find(function (v) { return /^fr/i.test(v.lang); }) || null;
+    var full = new RegExp(lang.replace('-', '[-_]'), 'i');
+    var prefix = new RegExp('^' + lang.split('-')[0], 'i');
+    var v = voices.find(function (x) { return full.test(x.lang); })
+         || voices.find(function (x) { return prefix.test(x.lang); }) || null;
+    voiceCache[lang] = v;
+    return v;
   }
-  if (synth) {
-    pickVoice();
-    if (typeof synth.onvoiceschanged !== 'undefined') synth.onvoiceschanged = pickVoice;
+  if (synth && typeof synth.onvoiceschanged !== 'undefined') {
+    synth.onvoiceschanged = function () { voiceCache = {}; };
   }
   var activeBtn = null;
   function clearSpeaking() { if (activeBtn) { activeBtn.classList.remove('is-speaking'); activeBtn = null; } }
-  function speak(text, btn) {
+  function speak(text, btn, lang) {
     if (!text || !synth || typeof window.SpeechSynthesisUtterance === 'undefined') return;
     try {
       synth.cancel(); clearSpeaking();
+      var L = lang || DEFAULT_LANG;
       var u = new SpeechSynthesisUtterance(text);
-      u.lang = 'fr-FR'; u.rate = 0.92; u.pitch = 1.0;
-      if (frVoice) u.voice = frVoice;
+      u.lang = L; u.rate = 0.92; u.pitch = 1.0;
+      var v = voiceFor(L);
+      if (v) u.voice = v;
       if (btn) {
         activeBtn = btn; btn.classList.add('is-speaking');
         u.onend = u.onerror = function () { if (activeBtn === btn) clearSpeaking(); };
@@ -67,12 +75,12 @@
       synth.speak(u);
     } catch (e) { clearSpeaking(); }
   }
-  function makeSpeakBtn(text) {
+  function makeSpeakBtn(text, lang) {
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'speak-btn';
     b.setAttribute('aria-label', '「' + (text || '') + '」を発音');
     b.textContent = '🔊';
-    b.addEventListener('click', function (e) { e.stopPropagation(); speak(text, b); });
+    b.addEventListener('click', function (e) { e.stopPropagation(); speak(text, b, lang); });
     return b;
   }
 
@@ -371,7 +379,7 @@
           '<p class="gphrase__ja">' + esc(ph.ja || '') + '</p>' +
           (ph.kana ? '<p class="gphrase__kana">' + esc(ph.kana) + '</p>' : '');
         row.appendChild(body);
-        row.appendChild(makeSpeakBtn(ph.fr));
+        row.appendChild(makeSpeakBtn(ph.fr, ph.lang));
         gw.appendChild(row);
       });
       sec.appendChild(gw);

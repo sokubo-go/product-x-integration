@@ -233,6 +233,23 @@ window.GUIDE_DAY = {
 3. **data/culture.js 追記**: 記事+6本(既存契約と同形式、id 重複禁止)
 4. **見せるカード**: フレーズカードに 🪧 ボタン → 全画面オーバーレイに仏語を特大表示(セリフ体・自動フィット)、下に日本語小さく、タップ/Escで閉じる。localStorage 不要。app.js + style.css のみ変更。guide.html のフレーズにも同ボタン(guide.js)…は今回見送り、本体のみ
 
+## イタリア編(guide-it.html)— ローマ & サントリーニ
+
+新婚旅行の後半日程(7/13 ローマ着 → 7/14 市内 → 7/15 サンタンジェロ→サントリーニへ → 7/17 島内観光)向け。
+仏語版ガイドと同じ契約・同じ guide.js / real-map.js / css/guide.css を再利用し、別ページとして追加する。
+
+- `guide-it.html` は guide.js 読み込み前に `window.GUIDE_LANG = 'it-IT'` を定義(音声がイタリア語になる)
+- フレーズはイタリア語 {fr(=現地語), ja, kana}。サントリーニのみギリシャ語で、各フレーズに `lang: "el-GR"` を付与
+- スポット/ストップ id と順序は固定(data/geo-it.js の座標キーと一致させること):
+  1. centro(ローマ歴史地区 ⛲): fontana-di-trevi / pantheon / piazza-navona / spagna / gelato
+  2. colosseo(コロッセオとフォロ・ロマーノ 🏛️): colosseo / arco-costantino / foro-romano / palatino / campidoglio / vittoriano
+  3. vaticano(バチカン市国 ⛪): piazza-san-pietro / basilica / cupola / musei-vaticani / cappella-sistina
+  4. santangelo(サンタンジェロ城とボルゴ 🏰): ponte / castello / terrazza / passetto / borgo
+  5. santorini(サントリーニ島 🏖️): oia / blue-domes / amoudi / sunset / fira / caldera-walk / akrotiri
+- ファイル分担: data/guide-it-roma.js(centro+colosseo)/ data/guide-it-vaticano.js(vaticano+santangelo+GUIDE_DAY)/ data/guide-it-santorini.js(santorini)
+- 読み込み順: guide-it-roma → guide-it-vaticano → guide-it-santorini → guide.js → leaflet → geo-it.js → real-map.js
+- index.html のホームにイタリア編への導線カードを追加。両ガイドのヘッダーで相互リンク
+
 ## 検証
 
 Playwright(内蔵 Chromium)で実際に開き、全タブ・音声ボタン・クイズ一巡・
