@@ -384,7 +384,10 @@
   function closeModal() {
     if (!modal || modal.hidden) return;
     modal.hidden = true;
-    document.body.style.overflow = '';
+    // 多重ロック配慮: 他のオーバーレイが開いていなければ解除
+    if ((!lightbox || lightbox.hidden) && (!showcardEl || showcardEl.hidden)) {
+      document.body.style.overflow = '';
+    }
     if (synth) synth.cancel();
     clearSpeakingState();
     if (lastFocused && lastFocused.focus) lastFocused.focus();
@@ -392,19 +395,15 @@
 
   if (modal) {
     $$('[data-close]', modal).forEach(function (el) { el.addEventListener('click', closeModal); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
   }
 
   // =========================================================
   // ナビゲーション
   // =========================================================
   var VIEWS = ['home', 'phrases', 'learn', 'culture', 'quiz'];
-  var current = 'home';
-  var quizInited = false;
 
   function navigate(view) {
     if (VIEWS.indexOf(view) === -1) view = 'home';
-    current = view;
 
     VIEWS.forEach(function (v) {
       var sec = $('#view-' + v);
@@ -463,7 +462,6 @@
       mount.innerHTML = '';
       try {
         window.Quiz.init(mount, PHRASES, speak);
-        quizInited = true;
       } catch (e) {
         mount.innerHTML = '<div class="quiz-fallback">クイズの読み込みに失敗しました。</div>';
       }
@@ -654,14 +652,16 @@
   function closeLightbox() {
     if (!lightbox || lightbox.hidden) return;
     lightbox.hidden = true;
-    if (!modal || modal.hidden) document.body.style.overflow = ''; // モーダルと共有のため
+    // 多重ロック配慮: 他のオーバーレイが開いていなければ解除
+    if ((!modal || modal.hidden) && (!showcardEl || showcardEl.hidden)) {
+      document.body.style.overflow = '';
+    }
     if (lbStage) lbStage.innerHTML = '';
     if (lbLastFocused && lbLastFocused.focus) lbLastFocused.focus();
   }
 
   if (lightbox) {
     $$('[data-lb-close]', lightbox).forEach(function (el) { el.addEventListener('click', closeLightbox); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLightbox(); });
   }
 
   // =========================================================
@@ -756,7 +756,13 @@
     }
   }
 
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeShowcard(); });
+  // Escape は最前面のオーバーレイだけを閉じる(見せるカード → ライトボックス → モーダルの順)
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (showcardEl && !showcardEl.hidden) { closeShowcard(); return; }
+    if (lightbox && !lightbox.hidden) { closeLightbox(); return; }
+    closeModal();
+  });
   window.addEventListener('resize', function () { if (showcardEl && !showcardEl.hidden) fitShowcard(); });
   window.addEventListener('orientationchange', function () { if (showcardEl && !showcardEl.hidden) fitShowcard(); });
 

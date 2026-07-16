@@ -14,9 +14,18 @@
   var SESSION_NEW_MAX = 6;   // 1セッションの新規カード上限
   var SHADOW_EVERY = 3;      // 何枚ごとにシャドーイングを挿入するか
   var SLOW_RATE = 0.7;
+  var PRACTICE_MAX = 8;      // 「それでも練習する」の出題枚数(採点なし)
 
   // ---------- ユーティリティ ----------
-  function todayNum() { return Math.floor(Date.now() / 86400000); }
+  // ローカル日付ベースの通算日(app.js の dayIndex と同じ基準)。
+  // UTC 通算日だと日本では朝9時に「日付」が切り替わってしまう。
+  function todayNum() {
+    var d = new Date();
+    return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+  }
+
+  // 音声合成が使えない環境ではリスニング形式を出題しない
+  var CAN_SPEAK = !!(window.speechSynthesis && typeof window.SpeechSynthesisUtterance !== 'undefined');
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -282,6 +291,7 @@
     // ホーム(レッスンタブ初期表示)
     // =========================================================
     function renderHome() {
+      stopPlayAll();
       container.className = 'learn-root';
       container.innerHTML = '';
 
@@ -318,7 +328,9 @@
           '今日のレッスンを始める <span class="learn-btn__sub">約5分</span></button>';
       } else {
         html += '<p class="learn-done-msg">✨ 今日の分は完了。明日また忘れかけた頃に会いましょう。</p>' +
-          '<button type="button" class="learn-btn learn-start-extra">それでも練習する</button>';
+          (CARDS.length
+            ? '<button type="button" class="learn-btn learn-start-extra">それでも練習する <span class="learn-btn__sub">採点なし</span></button>'
+            : '');
       }
       html += '</div>';
 
@@ -399,8 +411,10 @@
 
       container.innerHTML = html;
 
-      var startBtn = container.querySelector('.learn-start') || container.querySelector('.learn-start-extra');
+      var startBtn = container.querySelector('.learn-start');
       if (startBtn) startBtn.addEventListener('click', startSession);
+      var extraBtn = container.querySelector('.learn-start-extra');
+      if (extraBtn) extraBtn.addEventListener('click', startPractice);
       Array.prototype.forEach.call(container.querySelectorAll('[data-scene]'), function (el) {
         el.addEventListener('click', function () {
           openScene(dialogues[parseInt(el.getAttribute('data-scene'), 10)]);
@@ -455,6 +469,26 @@
       renderStep();
     }
 
+    // 「それでも練習する」: 学習済みカードからランダム出題。SRS には採点しない。
+    function startPractice() {
+      var srs = loadSrs();
+      var known = CARDS.filter(function (c) { return srs[c.key]; });
+      var review = shuffle(known.length ? known : CARDS).slice(0, PRACTICE_MAX);
+      if (!review.length) { renderHome(); return; }
+
+      var steps = [];
+      review.forEach(function (c, i) {
+        steps.push({ type: 'review', card: c });
+        if ((i + 1) % SHADOW_EVERY === 0) steps.push({ type: 'shadow', card: c });
+      });
+
+      session = {
+        steps: steps, index: 0, reviewed: 0, practice: true,
+        retBefore: overallRetention(), streakBefore: loadStreak().count
+      };
+      renderStep();
+    }
+
     function sessionProgress() {
       return Math.round((session.index / session.steps.length) * 100);
     }
@@ -476,7 +510,7 @@
       if (step.type === 'shadow') { renderShadow(step.card); return; }
       var box = boxOf(step.card);
       if (box >= 3) renderFlip(step.card);
-      else renderRecognition(step.card, Math.random() < 0.5 ? 'meaning' : 'listening');
+      else renderRecognition(step.card, (CAN_SPEAK && Math.random() < 0.5) ? 'listening' : 'meaning');
     }
 
     function advance() { session.index++; renderStep(); }
@@ -518,7 +552,7 @@
           if (answered) return;
           answered = true;
           var ok = opt === card.ja;
-          grade(card, ok);
+          if (!session.practice) grade(card, ok);
           session.reviewed++;
           Array.prototype.forEach.call(wrap.children, function (btn) {
             btn.disabled = true;
@@ -587,10 +621,12 @@
       });
 
       container.querySelector('.learn-eval-yes').addEventListener('click', function () {
-        grade(card, true); session.reviewed++; advance();
+        if (!session.practice) grade(card, true);
+        session.reviewed++; advance();
       });
       container.querySelector('.learn-eval-no').addEventListener('click', function () {
-        grade(card, false); session.reviewed++; advance();
+        if (!session.practice) grade(card, false);
+        session.reviewed++; advance();
       });
     }
 
@@ -628,7 +664,8 @@
         '<div class="learn-card learn-result">' +
           '<div class="learn-result__icon">🎉</div>' +
           '<p class="learn-result__praise">' + esc(praiseOne(lang)) + '</p>' +
-          '<p class="learn-result__sub">今日のレッスン、おつかれさまでした。</p>' +
+          '<p class="learn-result__sub">' +
+            (session.practice ? '追加練習、おつかれさまでした。' : '今日のレッスン、おつかれさまでした。') + '</p>' +
           '<div class="learn-result__stats">' +
             '<div class="learn-stat"><span class="learn-stat__n">' + session.reviewed + '</span>' +
               '<span class="learn-stat__l">枚 復習</span></div>' +
@@ -743,16 +780,25 @@
     }
 
     // 通し再生: 全ターン(you 含む)を順に再生。長さ推定で間隔を空ける。
+    // 画面遷移後に音声が鳴り続けないよう、タイマーは保持して停止できるようにする。
+    var playAllTimers = [];
+    function stopPlayAll() {
+      playAllTimers.forEach(clearTimeout);
+      playAllTimers = [];
+    }
     function playAll(turns, btn) {
+      stopPlayAll();
       if (btn) { btn.disabled = true; btn.classList.add('is-playing'); }
       var delay = 0, last = 0;
       turns.forEach(function (t) {
         var text = target(t);
-        setTimeout(function () { speak(text); }, delay);
+        playAllTimers.push(setTimeout(function () { speak(text); }, delay));
         var dur = Math.max(1500, text.length * 95);
         delay += dur; last = delay;
       });
-      if (btn) setTimeout(function () { btn.disabled = false; btn.classList.remove('is-playing'); }, last);
+      if (btn) playAllTimers.push(setTimeout(function () {
+        btn.disabled = false; btn.classList.remove('is-playing');
+      }, last));
     }
 
     // =========================================================

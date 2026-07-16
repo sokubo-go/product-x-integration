@@ -11,6 +11,9 @@
   var QUESTION_COUNT = 10;
   var WRONG_CHOICE_COUNT = 3;
 
+  // 音声合成が使えない環境ではリスニング問題を出題しない(解答不能になるため)
+  var CAN_SPEAK = !!(window.speechSynthesis && typeof window.SpeechSynthesisUtterance !== 'undefined');
+
   // ---------- スタイル自己注入(二重注入防止) ----------
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
@@ -141,7 +144,7 @@
     var n = Math.min(QUESTION_COUNT, all.length);
     var chosen = shuffle(all).slice(0, n);
     return chosen.map(function (p) {
-      var type = Math.random() < 0.5 ? 'meaning' : 'listening';
+      var type = (CAN_SPEAK && Math.random() < 0.5) ? 'listening' : 'meaning';
       var wrongs = pickWrongAnswers(all, p.ja, WRONG_CHOICE_COUNT);
       var options = shuffle([p.ja].concat(wrongs));
       return { phrase: p, type: type, options: options };
@@ -272,6 +275,7 @@
       if (isListening) {
         var speakBtn = container.querySelector('.quiz-speak-btn');
         speakBtn.addEventListener('click', function () { speakFn(q.phrase.fr); });
+        speakFn(q.phrase.fr); // 出題時に1回自動再生(レッスンと同じ挙動)
       }
     }
 
